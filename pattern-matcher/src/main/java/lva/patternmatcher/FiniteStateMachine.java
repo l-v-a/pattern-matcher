@@ -15,7 +15,7 @@ public class FiniteStateMachine<S, E> {
     private State<S, E> currentState;
 
     @FunctionalInterface
-    interface TransitionFunction<S, E> {
+    public interface TransitionFunction<S, E> {
         void apply(S from, S to, E event);
     }
 
