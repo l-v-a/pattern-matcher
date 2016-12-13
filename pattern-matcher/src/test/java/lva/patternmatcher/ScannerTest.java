@@ -57,6 +57,18 @@ public class ScannerTest {
     }
 
     @Test
+    public void should_parse_seq_that_contains_asterisks_and_second_literal_starts_with_capital_symbol() {
+        scanner.restart("abc**Def");
+        assertThat("abc**Def", list(scanner), is(list(literal("abc"), concatenation(), concatenation(), literal("Def"))));
+    }
+
+    @Test
+    public void should_parse_seq_that_contains_asterisks_between_capital_symbols() {
+        scanner.restart("abC**Def");
+        assertThat("abC**Def", list(scanner), is(list(literal("abC"), concatenation(), concatenation(), literal("Def"))));
+    }
+
+    @Test
     public void should_parse_beginning_capital_symbols_as_strict_concatenation() {
         scanner.restart("AbcDef");
         assertThat("AbcDef", list(scanner), is(list(literal("Abc"), strictConcatenation(), literal("Def"))));
@@ -67,6 +79,13 @@ public class ScannerTest {
         scanner.restart("abcDefFgh");
         assertThat("abcDefFgh", list(scanner), is(list(literal("abcDef"), strictConcatenation(), literal("Fgh"))));
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void should_throw_if_not_restarted() {
+        Scanner s = new Scanner();
+        s.next();
+    }
+
 
     private static List<Lexeme> list(Lexeme... lexemes) {
         return Arrays.asList(lexemes);

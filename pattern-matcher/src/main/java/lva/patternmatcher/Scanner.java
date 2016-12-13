@@ -43,6 +43,7 @@ class Scanner {
                 String.format("%s", type.name());
         }
 
+        // TODO: remove it - test only logic
         @Override
         public boolean equals(Object o) {
             if (o == this) return true;
@@ -53,6 +54,7 @@ class Scanner {
             return false;
         }
 
+        // TODO: remove it - test only logic
         @Override
         public int hashCode() {
             return Objects.hash(type, value);
