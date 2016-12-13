@@ -69,6 +69,16 @@ public class SuffixTrieTest {
         assertTrue(ast.query("d").getResultSet().isEmpty());
     }
 
+    @Test
+    public void should_add_matchings_sorted_order() {
+        SuffixTrie<String> ast = new SuffixTrie<>(Collections.singletonList("aaa"));
+        MatchingResultSet<String> res = ast.query("a");
+
+        assertEquals(0, getMatchingIndex(res, "aaa", 0, 1));
+        assertEquals(1, getMatchingIndex(res, "aaa", 1, 2));
+        assertEquals(2, getMatchingIndex(res, "aaa", 2, 3));
+    }
+
     @Test(expected = UnsupportedOperationException.class)
     public void should_return_unmodifiable_result() {
         SuffixTrie<String> ast = new SuffixTrie<>(Collections.singletonList("abc"));
