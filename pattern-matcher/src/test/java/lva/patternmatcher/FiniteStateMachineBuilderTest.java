@@ -33,13 +33,4 @@ public class FiniteStateMachineBuilderTest {
             .setFinishedState(State.S2)
             .build();
     }
-
-    @Test(expected = NullPointerException.class)
-    public void should_trow_if_finished_state_not_specified() {
-        FiniteStateMachine<State, Event> fsm = new FiniteStateMachine.Builder<State, Event>()
-            .addTransition(State.S1, State.S2, Event.S1_TO_S2, eventSink::onStateChanged)
-            .setInitialState(State.S1)
-            .build();
-    }
-
 }
