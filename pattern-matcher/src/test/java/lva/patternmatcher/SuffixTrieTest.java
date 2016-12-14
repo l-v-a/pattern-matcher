@@ -58,7 +58,7 @@ public class SuffixTrieTest {
     @Test
     public void should_find_all_substrings_overlapped() {
         SuffixTrie<String> ast = new SuffixTrie<>(Collections.singletonList("aaa"));
-        // TODO: reimplement
+
         assertEquals(0, getMatchingIndex(ast.query("aaa"), "aaa", 0, 3));
 
         assertEquals(0, getMatchingIndex(ast.query("aa"), "aaa", 0, 2));

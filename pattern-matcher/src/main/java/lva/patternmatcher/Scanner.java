@@ -32,9 +32,8 @@ class Scanner {
             return type;
         }
 
-        // TODO: use String
-        String getValue() {
-            return value.toString();
+        CharSequence getValue() {
+            return value;
         }
 
         @Override

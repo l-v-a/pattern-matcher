@@ -41,7 +41,6 @@ public class FiniteStateMachine<S, E> {
     private FiniteStateMachine(Map<S, State<S, E>> states, State<S, E> initialState, State<S, E> finishedState) {
         Objects.requireNonNull(states);
         Objects.requireNonNull(initialState);
-        Objects.requireNonNull(finishedState);
 
         this.states = states;
         this.initialState = initialState;
@@ -89,6 +88,11 @@ public class FiniteStateMachine<S, E> {
 
             Event<S, E> event = new Event<>(toState, beforeStateChanged);
             fromState.events.put(e, event);
+            return this;
+        }
+
+        public Builder<S, E> addTransition(S from, S to, E e) {
+            addTransition(from, to, e, (f, t, ev) -> {});
             return this;
         }
 
