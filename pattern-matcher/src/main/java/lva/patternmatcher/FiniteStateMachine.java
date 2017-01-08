@@ -39,11 +39,8 @@ public class FiniteStateMachine<S, E> {
     }
 
     private FiniteStateMachine(Map<S, State<S, E>> states, State<S, E> initialState, State<S, E> finishedState) {
-        Objects.requireNonNull(states);
-        Objects.requireNonNull(initialState);
-
-        this.states = states;
-        this.initialState = initialState;
+        this.states = Objects.requireNonNull(states);
+        this.initialState =  Objects.requireNonNull(initialState);
         this.finishedState = finishedState;
         this.currentState = this.initialState;
     }

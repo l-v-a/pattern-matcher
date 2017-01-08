@@ -170,9 +170,7 @@ class Scanner {
     }
 
     void restart(CharSequence newSequence) {
-        Objects.requireNonNull(newSequence);
-
-        sequence = newSequence;
+        sequence = Objects.requireNonNull(newSequence);
         currentCharIndex = 0;
         beginOfLexemeIndex = 0;
 
