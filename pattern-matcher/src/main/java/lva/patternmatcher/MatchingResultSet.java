@@ -1,5 +1,7 @@
 package lva.patternmatcher;
 
+import com.sun.istack.internal.Nullable;
+
 import java.util.*;
 import java.util.function.BiFunction;
 
@@ -87,10 +89,9 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     MatchingResultSet<T> filter(BiFunction<? super T, MatchingEntries, MatchingEntries> filter) {
         MatchingResultSet<T> result = new MatchingResultSet<>();
         resultSet.forEach((word, entries) -> {
-            MatchingEntries filteredEntries = filter.apply(word, entries);
-            if (filteredEntries != null) {
-                result.resultSet.put(word, filteredEntries);
-            }
+            Optional.ofNullable(filter.apply(word, entries)).ifPresent((value) -> {
+                result.resultSet.put(word, value);
+            });
         });
         return result;
     }
@@ -104,13 +105,11 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     MatchingResultSet<T> combine(MatchingResultSet<T> other, CombineFunction<? super T> combineFunction) {
         MatchingResultSet<T> result = new MatchingResultSet<>();
         resultSet.forEach((word, entries) -> {
-            MatchingEntries entriesOther = other.resultSet.get(word);
-            if (entriesOther != null) {
-                MatchingEntries combinedEntries = combineFunction.apply(word, entries, entriesOther);
-                if (combinedEntries != null) {
+            Optional.ofNullable(other.resultSet.get(word)).ifPresent((entriesOther) -> {
+                Optional.ofNullable(combineFunction.apply(word, entries, entriesOther)).ifPresent((combinedEntries) -> {
                     result.resultSet.put(word, combinedEntries);
-                }
-            }
+                });
+            });
         });
         return result;
     }
