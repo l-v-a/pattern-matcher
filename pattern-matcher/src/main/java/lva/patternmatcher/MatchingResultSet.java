@@ -50,8 +50,7 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         }
 
         MatchingEntries add(int left, int right) {
-            add(new Matching(left, right));
-            return this;
+            return add(new Matching(left, right));
         }
 
         MatchingEntries add(Matching matching) {
@@ -80,8 +79,9 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         return Collections.unmodifiableMap(resultSet);
     }
 
-    void add(T word, int from, int to) {
+    MatchingResultSet<T> add(T word, int from, int to) {
         resultSet.computeIfAbsent(word, (i) -> new MatchingEntries()).add(from, to);
+        return this;
     }
 
     MatchingResultSet<T> filter(BiFunction<? super T, MatchingEntries, MatchingEntries> filter) {
@@ -94,6 +94,27 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         });
         return result;
     }
+
+
+    @FunctionalInterface
+    interface CombineFunction <T> {
+        MatchingEntries apply(T t, MatchingEntries entriesLeft, MatchingEntries entriesRight);
+    }
+
+    MatchingResultSet<T> combine(MatchingResultSet<T> other, CombineFunction<? super T> combineFunction) {
+        MatchingResultSet<T> result = new MatchingResultSet<>();
+        resultSet.forEach((word, entries) -> {
+            MatchingEntries entriesOther = other.resultSet.get(word);
+            if (entriesOther != null) {
+                MatchingEntries combinedEntries = combineFunction.apply(word, entries, entriesOther);
+                if (combinedEntries != null) {
+                    result.resultSet.put(word, combinedEntries);
+                }
+            }
+        });
+        return result;
+    }
+
 
     @SuppressWarnings("unchecked")
     static <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> emptyResultSet() {
