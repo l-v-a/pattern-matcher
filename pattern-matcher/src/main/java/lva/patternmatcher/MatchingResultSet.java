@@ -1,6 +1,7 @@
 package lva.patternmatcher;
 
 import java.util.*;
+import java.util.function.BiFunction;
 
 
 /**
@@ -36,11 +37,11 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     static class MatchingEntries {
         private final List<Matching> matchings;
 
-        private MatchingEntries() {
+        MatchingEntries() {
             matchings = new ArrayList<>();
         }
 
-        private MatchingEntries(MatchingEntries other) {
+        MatchingEntries(MatchingEntries other) {
             matchings = new ArrayList<>(other.matchings);
         }
 
@@ -48,12 +49,14 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
             return Collections.unmodifiableList(matchings);
         }
 
-        private void add(int left, int right) {
+        MatchingEntries add(int left, int right) {
             add(new Matching(left, right));
+            return this;
         }
 
-        private void add(Matching matching) {
+        MatchingEntries add(Matching matching) {
             matchings.add(matching);
+            return this;
         }
 
         @Override
@@ -79,6 +82,17 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
 
     void add(T word, int from, int to) {
         resultSet.computeIfAbsent(word, (i) -> new MatchingEntries()).add(from, to);
+    }
+
+    MatchingResultSet<T> filter(BiFunction<? super T, MatchingEntries, MatchingEntries> filter) {
+        MatchingResultSet<T> result = new MatchingResultSet<>();
+        resultSet.forEach((word, entries) -> {
+            MatchingEntries filteredEntries = filter.apply(word, entries);
+            if (filteredEntries != null) {
+                result.resultSet.put(word, filteredEntries);
+            }
+        });
+        return result;
     }
 
     @SuppressWarnings("unchecked")
