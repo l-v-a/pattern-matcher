@@ -1,12 +1,11 @@
 package lva.patternmatcher;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * @author vlitvinenko
  */
-class SuffixTrie<T extends CharSequence & Comparable<? super T>> {
+class SuffixTrie<T extends CharSequence & Comparable<? super T>> implements Searchable<T> {
 
     private static class Node<T extends CharSequence & Comparable<? super T>> {
         final Map<Character, Node<T>> children = new HashMap<>();
@@ -60,7 +59,9 @@ class SuffixTrie<T extends CharSequence & Comparable<? super T>> {
         }
     }
 
-    MatchingResultSet<T> query(T pattern) {
+
+    @Override
+    public MatchingResultSet<T> search(CharSequence pattern) {
         Objects.requireNonNull(pattern);
 
         Node<T> node = rootNode;

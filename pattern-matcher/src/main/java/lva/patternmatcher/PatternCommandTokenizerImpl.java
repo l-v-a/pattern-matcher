@@ -7,22 +7,7 @@ import java.util.Objects;
 /**
  * @author vlitvinenko
  */
-class PatternParserImpl implements PatternParser {
-
-    private static final EventListener NULL_LISTENER = new EventListener() {
-        @Override
-        public void beginParsed(CharSequence sequence) {}
-
-        @Override
-        public void beginAnyParsed(CharSequence sequence) {}
-
-        @Override
-        public void expressionAnyParsed(CharSequence sequence) {}
-
-        @Override
-        public void expressionStrictParsed(CharSequence sequence) {}
-    };
-
+class PatternCommandTokenizerImpl implements PatternCommandTokenizer {
     private enum State {
         INITIAL,
         BEGIN,
@@ -34,44 +19,53 @@ class PatternParserImpl implements PatternParser {
     private final Scanner scanner = new Scanner();
     private final FiniteStateMachine<State, Lexeme.Type> fsm;
     private Lexeme currentLexeme;
-    private EventListener listener = NULL_LISTENER;
+    private Command currentCommand;
 
-    PatternParserImpl() {
+    PatternCommandTokenizerImpl() {
         this.fsm = new FiniteStateMachine.Builder<State, Lexeme.Type>()
             .setInitialState(State.INITIAL)
             .addTransition(State.INITIAL, State.BEGIN, Lexeme.Type.LITERAL, ((from, to, event) -> {
-                listener.beginParsed(currentLexeme.getValue());
+                currentCommand = new BeginPatternCommand(currentLexeme.getValue());
             }))
             .addTransition(State.INITIAL, State.BEGIN_ANY, Lexeme.Type.CONCATENATION)
             .addTransition(State.BEGIN, State.EXP_ANY, Lexeme.Type.CONCATENATION)
             .addTransition(State.BEGIN, State.EXP_STRICT, Lexeme.Type.STRICT_CONCATENATION)
             .addTransition(State.BEGIN_ANY, State.BEGIN, Lexeme.Type.LITERAL, ((from, to, event) -> {
-                listener.beginAnyParsed(currentLexeme.getValue());
+                currentCommand = new BeginAnyPatternCommand(currentLexeme.getValue());
             }))
             .addTransition(State.BEGIN_ANY, State.BEGIN_ANY, Lexeme.Type.CONCATENATION)
             .addTransition(State.EXP_ANY, State.EXP_ANY, Lexeme.Type.CONCATENATION)
             .addTransition(State.EXP_ANY, State.BEGIN, Lexeme.Type.LITERAL, ((from, to, event) -> {
-                listener.expressionAnyParsed(currentLexeme.getValue());
+                currentCommand = new ExpressionAnyPatternCommand(currentLexeme.getValue());
             }))
             .addTransition(State.EXP_STRICT, State.BEGIN, Lexeme.Type.LITERAL, ((from, to, event) -> {
-                listener.expressionStrictParsed(currentLexeme.getValue());
+                currentCommand = new ExpressionStrictPatternCommand(currentLexeme.getValue());
             }))
             .build();
     }
 
     @Override
-    public void setEventListener(EventListener listener) {
-        this.listener = listener == null ? NULL_LISTENER: listener;
+    public void restart(CharSequence pattern) {
+        scanner.restart(Objects.requireNonNull(pattern));
+        fsm.reset();
+
+        currentCommand = null;
+        currentLexeme = scanner.next();
+
+        tokenize();
     }
 
     @Override
-    public void parse(CharSequence pattern) {
-        Objects.requireNonNull(pattern);
+    public Command nextCommand() {
+        Command command = this.currentCommand;
+        tokenize();
+        return command;
+    }
 
-        scanner.restart(pattern);
-        currentLexeme = scanner.next();
+    private void tokenize() {
+        Command prevCommand = currentCommand;
 
-        while (currentLexeme != null) {
+        while (currentLexeme != null && prevCommand == currentCommand) {
             fsm.dispatch(currentLexeme.getType());
             currentLexeme = scanner.next();
         }
