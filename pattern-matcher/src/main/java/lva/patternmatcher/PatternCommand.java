@@ -25,7 +25,9 @@ class BeginPatternCommand extends PatternCommandAbstract {
     }
 
     @Override
-    public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(MatchingResultSet<T> l, MatchingResultSet<T> r) {
+    public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
+        MatchingResultSet<T> l, MatchingResultSet<T> r) {
+
         return null;
     }
 }
@@ -36,7 +38,9 @@ class BeginAnyPatternCommand extends PatternCommandAbstract {
     }
 
     @Override
-    public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(MatchingResultSet<T> l, MatchingResultSet<T> r) {
+    public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
+        MatchingResultSet<T> l, MatchingResultSet<T> r) {
+
         return null;
     }
 }
@@ -47,7 +51,9 @@ class ExpressionAnyPatternCommand extends PatternCommandAbstract {
     }
 
     @Override
-    public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(MatchingResultSet<T> l, MatchingResultSet<T> r) {
+    public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
+        MatchingResultSet<T> l, MatchingResultSet<T> r) {
+
         return null;
     }
 }
@@ -58,7 +64,9 @@ class ExpressionStrictPatternCommand extends PatternCommandAbstract {
     }
 
     @Override
-    public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(MatchingResultSet<T> l, MatchingResultSet<T> r) {
+    public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
+        MatchingResultSet<T> l, MatchingResultSet<T> r) {
+
         return null;
     }
 }
