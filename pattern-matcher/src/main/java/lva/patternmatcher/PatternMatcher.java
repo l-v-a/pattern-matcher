@@ -6,7 +6,6 @@ package lva.patternmatcher;
 public class PatternMatcher <T extends CharSequence & Comparable<? super T>> {
     private final PatternCommandTokenizer CommandTokenizer;
     private final Searchable<T> searchable;
-    private  MatchingResultSet<T> resultSet = new MatchingResultSet<T>();
 
     public PatternMatcher(Iterable<T> words) {
         this(new PatternCommandTokenizerImpl(), new SuffixTrie<>(words));

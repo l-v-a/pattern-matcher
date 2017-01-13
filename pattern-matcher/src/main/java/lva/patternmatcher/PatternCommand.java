@@ -1,5 +1,9 @@
 package lva.patternmatcher;
 
+import lva.patternmatcher.MatchingResultSet.Matching;
+import lva.patternmatcher.MatchingResultSet.MatchingEntries;
+
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -28,7 +32,14 @@ class BeginPatternCommand extends PatternCommandAbstract {
     public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
-        return null;
+        return r.filter((word, entries) -> {
+            List<Matching> matchings = entries.getMatchings();
+            if (!matchings.isEmpty() && matchings.get(0).getFrom() == 0) {
+                return new MatchingEntries()
+                    .add(matchings.get(0));
+            }
+            return null;
+        });
     }
 }
 
@@ -41,7 +52,14 @@ class BeginAnyPatternCommand extends PatternCommandAbstract {
     public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
-        return null;
+        return r.filter((word, entries) -> {
+            List<Matching> matchings = entries.getMatchings();
+            if (!matchings.isEmpty()) {
+                return new MatchingEntries()
+                    .add(matchings.get(0));
+            }
+            return null;
+        });
     }
 }
 

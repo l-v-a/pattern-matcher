@@ -1,6 +1,8 @@
 package lva.patternmatcher;
 
-import com.sun.istack.internal.Nullable;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -9,25 +11,15 @@ import java.util.function.BiFunction;
 /**
  * @author vlitvinenko
  */
+@EqualsAndHashCode
+@ToString
 class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     private static final MatchingResultSet EMPTY = unmodifiable(new MatchingResultSet());
 
+    @Data
     static class Matching {
         private final int from;
         private final int to;
-
-        private Matching(int from, int to) {
-            this.from = from;
-            this.to = to;
-        }
-
-        int getFrom() {
-            return from;
-        }
-
-        int getTo() {
-            return to;
-        }
 
         @Override
         public String toString() {
@@ -36,6 +28,8 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     }
 
 
+    @EqualsAndHashCode
+    @ToString
     static class MatchingEntries {
         private final List<Matching> matchings;
 
@@ -59,12 +53,6 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
             matchings.add(matching);
             return this;
         }
-
-        @Override
-        public String toString() {
-            return matchings.toString();
-        }
-
     }
 
     private final Map<T, MatchingEntries> resultSet;
