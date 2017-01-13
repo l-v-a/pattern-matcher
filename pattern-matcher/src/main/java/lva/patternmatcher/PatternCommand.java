@@ -3,8 +3,7 @@ package lva.patternmatcher;
 import lva.patternmatcher.MatchingResultSet.Matching;
 import lva.patternmatcher.MatchingResultSet.MatchingEntries;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author vlitvinenko
@@ -72,7 +71,28 @@ class ExpressionAnyPatternCommand extends PatternCommandAbstract {
     public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
-        return null;
+        return l.combine(r, (word, entriesLeft, entriesRight) -> {
+            List<Matching> matchingsLeft = entriesLeft.getMatchings();
+
+            if (!matchingsLeft.isEmpty()) {
+                Matching matchingLeft = matchingsLeft.get(matchingsLeft.size() - 1);
+                List<Matching> matchingsRight = entriesRight.getMatchings();
+                // search for nearest entry (lists sorted)
+                Matching searchMatching = new Matching(matchingLeft.getTo(), matchingLeft.getTo());
+                int idx = Collections.binarySearch(matchingsRight, searchMatching, (m1, m2) ->
+                    Integer.compare(m1.getFrom(), m2.getFrom())
+                );
+
+                idx = idx < 0 ? -idx - 1 : idx;
+                Matching matching = idx < matchingsRight.size() ? matchingsRight.get(idx) : null;
+
+                if (matching != null) {
+                    return new MatchingEntries(entriesLeft)
+                        .add(matching);
+                }
+            }
+            return null;
+        });
     }
 }
 
