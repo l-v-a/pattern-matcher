@@ -2,6 +2,7 @@ package lva.patternmatcher;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.ToString;
 
 import java.util.*;
@@ -49,10 +50,30 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
             return add(new Matching(left, right));
         }
 
-        MatchingEntries add(Matching matching) {
+        MatchingEntries add(@NonNull Matching matching) {
             matchings.add(matching);
             return this;
         }
+
+        Matching getFirstMatching() {
+            return matchings.isEmpty() ? null : matchings.get(0);
+        }
+
+        Matching getLastMatching() {
+            return matchings.isEmpty() ? null : matchings.get(matchings.size() - 1);
+        }
+
+        Matching findNearestMatching(@NonNull Matching matching) {
+            // search for nearest entry (lists are sorted)
+            Matching searchMatching = new Matching(matching.getTo(), matching.getTo());
+            int idx = Collections.binarySearch(matchings, searchMatching, (m1, m2) ->
+                Integer.compare(m1.getFrom(), m2.getFrom())
+            );
+
+            idx = idx < 0 ? -idx - 1 : idx;
+            return idx < matchings.size() ? matchings.get(idx) : null;
+        }
+
     }
 
     private final Map<T, MatchingEntries> resultSet;
@@ -61,7 +82,7 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         resultSet = new TreeMap<>();
     }
 
-    private MatchingResultSet(Map<T, MatchingEntries> matchingEntriesMap) {
+    private MatchingResultSet(@NonNull Map<T, MatchingEntries> matchingEntriesMap) {
         this.resultSet = matchingEntriesMap;
     }
 

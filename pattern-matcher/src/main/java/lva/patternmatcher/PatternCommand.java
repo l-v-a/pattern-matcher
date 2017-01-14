@@ -1,5 +1,6 @@
 package lva.patternmatcher;
 
+import lombok.NonNull;
 import lva.patternmatcher.MatchingResultSet.Matching;
 import lva.patternmatcher.MatchingResultSet.MatchingEntries;
 
@@ -11,18 +12,18 @@ import java.util.*;
 
 abstract class AbstractPatternCommand implements PatternCommandTokenizer.Command {
     private final CharSequence pattern;
-    AbstractPatternCommand(CharSequence pattern) {
-        this.pattern = Objects.requireNonNull(pattern);
-        if (this.pattern.length() == 0) {
+
+    AbstractPatternCommand(@NonNull CharSequence pattern) {
+        if (pattern.length() == 0) {
             throw new IllegalArgumentException("Empty pattern for command");
         }
+        this.pattern = pattern;
     }
 
     @Override
     public CharSequence getPattern() {
-        return pattern ;
+        return pattern;
     }
-
 }
 
 class BeginPatternCommand extends AbstractPatternCommand {
@@ -35,10 +36,10 @@ class BeginPatternCommand extends AbstractPatternCommand {
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
         return r.filter((word, entries) -> {
-            List<Matching> matchings = entries.getMatchings();
-            if (!matchings.isEmpty() && matchings.get(0).getFrom() == 0) {
+            Matching matching = entries.getFirstMatching();
+            if (matching != null && matching.getFrom() == 0) {
                 return new MatchingEntries()
-                    .add(matchings.get(0));
+                    .add(matching);
             }
             return null;
         });
@@ -55,10 +56,10 @@ class BeginAnyPatternCommand extends AbstractPatternCommand {
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
         return r.filter((word, entries) -> {
-            List<Matching> matchings = entries.getMatchings();
-            if (!matchings.isEmpty()) {
+            Matching matching = entries.getFirstMatching();
+            if (matching != null) {
                 return new MatchingEntries()
-                    .add(matchings.get(0));
+                    .add(matching);
             }
             return null;
         });
@@ -75,26 +76,14 @@ class ExpressionAnyPatternCommand extends AbstractPatternCommand {
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
         return l.combine(r, (word, entriesLeft, entriesRight) -> {
-            List<Matching> matchingsLeft = entriesLeft.getMatchings();
+            Matching matchingLeft = entriesLeft.getLastMatching();
+            Matching matchingRight = matchingLeft != null ? entriesRight.findNearestMatching(matchingLeft) : null;
 
-            if (!matchingsLeft.isEmpty()) {
-                // TODO: refactor
-                Matching matchingLeft = matchingsLeft.get(matchingsLeft.size() - 1);
-                List<Matching> matchingsRight = entriesRight.getMatchings();
-                // search for nearest entry (lists sorted)
-                Matching searchMatching = new Matching(matchingLeft.getTo(), matchingLeft.getTo());
-                int idx = Collections.binarySearch(matchingsRight, searchMatching, (m1, m2) ->
-                    Integer.compare(m1.getFrom(), m2.getFrom())
-                );
-
-                idx = idx < 0 ? -idx - 1 : idx;
-                Matching matching = idx < matchingsRight.size() ? matchingsRight.get(idx) : null;
-
-                if (matching != null) {
-                    return new MatchingEntries(entriesLeft)
-                        .add(matching);
-                }
+            if (matchingRight != null) {
+                return new MatchingEntries(entriesLeft)
+                    .add(matchingRight);
             }
+
             return null;
         });
     }
@@ -110,36 +99,25 @@ class ExpressionStrictPatternCommand extends AbstractPatternCommand {
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
         return l.combine(r, (word, entriesLeft, entriesRight) -> {
-            List<Matching> matchingsLeft = entriesLeft.getMatchings();
+            Matching matchingLeft = entriesLeft.getLastMatching();
+            Matching matchingRight = matchingLeft != null ? entriesRight.findNearestMatching(matchingLeft) : null;
 
-            if (!matchingsLeft.isEmpty()) {
-                Matching matchingLeft = matchingsLeft.get(matchingsLeft.size() - 1);
-                List<Matching> matchingsRight = entriesRight.getMatchings();
-                // search for nearest entry (lists sorted)
-                Matching searchMatching = new Matching(matchingLeft.getTo(), matchingLeft.getTo());
-                int idx = Collections.binarySearch(matchingsRight, searchMatching, (m1, m2) ->
-                    Integer.compare(m1.getFrom(), m2.getFrom())
-                );
+            if (matchingRight != null) {
+                // check pattern
+                int from = matchingLeft.getTo();
+                int to = matchingRight.getFrom();
+                boolean isValid = true;
 
-                idx = idx < 0 ? -idx - 1 : idx;
-                Matching matchingRight = idx < matchingsRight.size() ? matchingsRight.get(idx) : null;
+                for (int i = from; i < to && isValid; i++) {
+                    isValid = Character.isLowerCase(word.charAt(i));
+                }
 
-                if (matchingRight != null) {
-                    // check pattern
-                    int from = matchingLeft.getTo();
-                    int to = matchingRight.getFrom();
-                    boolean isValid = true;
-
-                    for (int i = from; i < to && isValid; i++) {
-                        isValid = Character.isLowerCase(word.charAt(i));
-                    }
-
-                    if (isValid) {
-                        return new MatchingEntries(entriesLeft)
-                            .add(matchingRight);
-                    }
+                if (isValid) {
+                    return new MatchingEntries(entriesLeft)
+                        .add(matchingRight);
                 }
             }
+
             return null;
         });
     }
