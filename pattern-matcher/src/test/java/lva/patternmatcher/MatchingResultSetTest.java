@@ -30,16 +30,6 @@ public class MatchingResultSetTest {
         assertEquals(1, getMatchingIndex(resultSet, "a", 1, 2));
     }
 
-    @Test
-    public void should_not_change_order_for_matchings() {
-        MatchingResultSet<String> resultSet = new MatchingResultSet<String>()
-            .add("a", 1, 2)
-            .add("a", 0, 1);
-
-        assertEquals(1, resultSet.getResultSet().size());
-        assertEquals(0, getMatchingIndex(resultSet, "a", 1, 2));
-        assertEquals(1, getMatchingIndex(resultSet, "a", 0, 1));
-    }
 
     @Test
     public void should_add_matching_for_many_words() {
