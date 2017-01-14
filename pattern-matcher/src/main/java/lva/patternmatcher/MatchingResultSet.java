@@ -53,10 +53,9 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         MatchingEntries add(@NonNull Matching matching) {
             Matching lastMatching = getLastMatching();
             if (lastMatching != null && lastMatching.getFrom() >= matching.getFrom()) {
-                throw new IllegalArgumentException(String.format("Trying add matching lesser that last. last: %s, add: %s",
+                throw new IllegalArgumentException(String.format("Trying to add matching lesser that last. last: %s, adding: %s",
                     lastMatching, matching));
             }
-
 
             matchings.add(matching);
             return this;
