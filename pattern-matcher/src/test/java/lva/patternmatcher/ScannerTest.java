@@ -80,6 +80,12 @@ public class ScannerTest {
         assertThat("abcDefFgh", list(scanner), is(list(literal("abcDef"), strictConcatenation(), literal("Fgh"))));
     }
 
+    @Test
+    public void should_parse_beginning_capital_symbols_as_strict_concatenation_only_for_following_capital_symbols_without_asterisks() {
+        scanner.restart("Abc*Ghj");
+        assertThat("Abc*Ghj", list(scanner), is(list(literal("Abc"), concatenation(), literal("Ghj"))));
+    }
+
     @Test(expected = IllegalStateException.class)
     public void should_throw_if_not_restarted() {
         Scanner s = new Scanner();
