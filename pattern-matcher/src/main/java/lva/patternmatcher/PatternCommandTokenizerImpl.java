@@ -1,5 +1,6 @@
 package lva.patternmatcher;
 
+import lombok.NonNull;
 import lva.patternmatcher.Scanner.Lexeme;
 
 import java.util.Objects;
@@ -45,8 +46,8 @@ class PatternCommandTokenizerImpl implements PatternCommandTokenizer {
     }
 
     @Override
-    public void restart(CharSequence pattern) {
-        scanner.restart(Objects.requireNonNull(pattern));
+    public void restart(@NonNull CharSequence pattern) {
+        scanner.restart(pattern);
         fsm.reset();
 
         currentCommand = null;

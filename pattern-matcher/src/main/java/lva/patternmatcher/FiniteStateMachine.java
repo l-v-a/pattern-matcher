@@ -1,5 +1,7 @@
 package lva.patternmatcher;
 
+import lombok.NonNull;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -38,16 +40,14 @@ public class FiniteStateMachine<S, E> {
         }
     }
 
-    private FiniteStateMachine(Map<S, State<S, E>> states, State<S, E> initialState, State<S, E> finishedState) {
-        this.states = Objects.requireNonNull(states);
-        this.initialState =  Objects.requireNonNull(initialState);
+    private FiniteStateMachine(@NonNull Map<S, State<S, E>> states, @NonNull State<S, E> initialState, State<S, E> finishedState) {
+        this.states = states;
+        this.initialState = initialState;
         this.finishedState = finishedState;
         this.currentState = this.initialState;
     }
 
-    public void dispatch(E e) {
-        Objects.requireNonNull(e);
-
+    public void dispatch(@NonNull E e) {
         Event<S, E> event = currentState.events.get(e);
         if (event == null) {
             throw new IllegalArgumentException(String.format("Unexpected event %s for state %s", e, currentState.state));
@@ -74,12 +74,7 @@ public class FiniteStateMachine<S, E> {
         private State<S, E> initialState;
         private State<S, E> finishState;
 
-        public Builder<S, E> addTransition(S from, S to, E e, TransitionFunction<S, E> beforeStateChanged) {
-            Objects.requireNonNull(from);
-            Objects.requireNonNull(to);
-            Objects.requireNonNull(e);
-            Objects.requireNonNull(beforeStateChanged);
-
+        public Builder<S, E> addTransition(@NonNull S from, @NonNull S to, @NonNull E e, @NonNull TransitionFunction<S, E> beforeStateChanged) {
             State<S, E> fromState = states.computeIfAbsent(from, (k) -> new State<>(from));
             State<S, E> toState = states.computeIfAbsent(to, (k) -> new State<>(to));
 
@@ -93,14 +88,12 @@ public class FiniteStateMachine<S, E> {
             return this;
         }
 
-        public Builder<S, E> setInitialState(S state) {
-            Objects.requireNonNull(state);
+        public Builder<S, E> setInitialState(@NonNull S state) {
             initialState = states.computeIfAbsent(state, (k) -> new State<>(state));
             return this;
         }
 
-        public Builder<S, E> setFinishedState(S state) {
-            Objects.requireNonNull(state);
+        public Builder<S, E> setFinishedState(@NonNull S state) {
             finishState = states.computeIfAbsent(state, (k) -> new State<>(state));
             return this;
         }
