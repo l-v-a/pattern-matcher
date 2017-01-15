@@ -10,14 +10,14 @@ import java.util.Objects;
  * @author vlitvinenko
  */
 
-public class FiniteStateMachine<S, E> {
+class FiniteStateMachine<S, E> {
     private final Map<S, State<S, E>> states;
     private final State<S, E> initialState;
     private final State<S, E> finishedState;
     private State<S, E> currentState;
 
     @FunctionalInterface
-    public interface TransitionFunction<S, E> {
+    interface TransitionFunction<S, E> {
         void apply(S from, S to, E event);
     }
 
@@ -47,7 +47,7 @@ public class FiniteStateMachine<S, E> {
         this.currentState = this.initialState;
     }
 
-    public void dispatch(@NonNull E e) {
+    void dispatch(@NonNull E e) {
         Event<S, E> event = currentState.events.get(e);
         if (event == null) {
             throw new IllegalArgumentException(String.format("Unexpected event %s for state %s", e, currentState.state));
@@ -57,24 +57,24 @@ public class FiniteStateMachine<S, E> {
         currentState = event.targetState;
     }
 
-    public boolean isFinished() {
+    boolean isFinished() {
         return currentState.state.equals(finishedState.state);
     }
 
-    public S getCurrentState() {
+    S getCurrentState() {
         return currentState.state;
     }
 
-    public void reset() {
+    void reset() {
         currentState = initialState;
     }
 
-    public static class Builder<S, E> {
+    static class Builder<S, E> {
         private final Map<S, State<S, E>> states = new HashMap<>();
         private State<S, E> initialState;
         private State<S, E> finishState;
 
-        public Builder<S, E> addTransition(@NonNull S from, @NonNull S to, @NonNull E e, @NonNull TransitionFunction<S, E> beforeStateChanged) {
+        Builder<S, E> addTransition(@NonNull S from, @NonNull S to, @NonNull E e, @NonNull TransitionFunction<S, E> beforeStateChanged) {
             State<S, E> fromState = states.computeIfAbsent(from, (k) -> new State<>(from));
             State<S, E> toState = states.computeIfAbsent(to, (k) -> new State<>(to));
 
@@ -83,22 +83,22 @@ public class FiniteStateMachine<S, E> {
             return this;
         }
 
-        public Builder<S, E> addTransition(S from, S to, E e) {
+        Builder<S, E> addTransition(S from, S to, E e) {
             addTransition(from, to, e, (f, t, ev) -> {});
             return this;
         }
 
-        public Builder<S, E> setInitialState(@NonNull S state) {
+        Builder<S, E> setInitialState(@NonNull S state) {
             initialState = states.computeIfAbsent(state, (k) -> new State<>(state));
             return this;
         }
 
-        public Builder<S, E> setFinishedState(@NonNull S state) {
+        Builder<S, E> setFinishedState(@NonNull S state) {
             finishState = states.computeIfAbsent(state, (k) -> new State<>(state));
             return this;
         }
 
-        public FiniteStateMachine<S, E> build() {
+        FiniteStateMachine<S, E> build() {
             return new FiniteStateMachine<>(states, initialState, finishState);
         }
     }

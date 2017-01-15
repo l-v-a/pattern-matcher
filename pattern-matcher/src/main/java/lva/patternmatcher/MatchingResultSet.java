@@ -14,11 +14,11 @@ import java.util.function.BiFunction;
  */
 @EqualsAndHashCode
 @ToString
-class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
+public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     private static final MatchingResultSet EMPTY = unmodifiable(new MatchingResultSet());
 
     @Data
-    static class Matching {
+    public static class Matching {
         private final int from;
         private final int to;
 
@@ -31,7 +31,7 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
 
     @EqualsAndHashCode
     @ToString
-    static class MatchingEntries {
+    public static class MatchingEntries {
         private final List<Matching> matchings;
 
         MatchingEntries() {
@@ -42,7 +42,7 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
             matchings = new ArrayList<>(other.matchings);
         }
 
-        List<Matching> getMatchings() {
+        public List<Matching> getMatchings() {
             return Collections.unmodifiableList(matchings);
         }
 
@@ -92,7 +92,7 @@ class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         this.resultSet = matchingEntriesMap;
     }
 
-    Map<T, MatchingEntries> getResultSet() {
+    public Map<T, MatchingEntries> getResultSet() {
         return Collections.unmodifiableMap(resultSet);
     }
 
