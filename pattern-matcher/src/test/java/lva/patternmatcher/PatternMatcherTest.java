@@ -4,6 +4,7 @@ import lva.patternmatcher.PatternCommandTokenizer.Command;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -16,7 +17,7 @@ import static org.mockito.Mockito.when;
  */
 public class PatternMatcherTest {
     private final PatternMatcher<String> matcher = new PatternMatcher<>(
-        Arrays.asList("AbcDef", "AbcDefGhj", "xyzAbcDef")
+        Stream.of("AbcDef", "AbcDefGhj", "xyzAbcDef")
     );
 
     @Test

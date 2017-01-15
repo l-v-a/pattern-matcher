@@ -1,5 +1,7 @@
 package lva.patternmatcher;
 
+import java.util.stream.Stream;
+
 /**
  * @author vlitvinenko
  */
@@ -7,7 +9,7 @@ public class PatternMatcher <T extends CharSequence & Comparable<? super T>> {
     private final PatternCommandTokenizer commandTokenizer;
     private final Searchable<T> searchable;
 
-    public PatternMatcher(Iterable<T> words) {
+    public PatternMatcher(Stream<T> words) {
         this(new PatternCommandTokenizerImpl(), new SuffixTrie<>(words));
     }
 

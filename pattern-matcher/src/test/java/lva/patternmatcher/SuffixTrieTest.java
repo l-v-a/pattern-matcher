@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static lva.patternmatcher.Utils.getMatchingIndex;
 import static org.junit.Assert.*;
@@ -16,7 +17,7 @@ public class SuffixTrieTest {
 
     @Test
     public void should_find_all_matches_of_substring() {
-        SuffixTrie<String> ast = new SuffixTrie<>(Collections.singletonList("abababa"));
+        SuffixTrie<String> ast = new SuffixTrie<>(Stream.of("abababa"));
         MatchingResultSet<String> res = ast.search("aba");
 
         assertEquals(0, getMatchingIndex(res, "abababa", 0, 3));
@@ -26,7 +27,7 @@ public class SuffixTrieTest {
 
     @Test
     public void should_find_all_matches_of_substring_for_all_inputs() {
-        SuffixTrie<String> ast = new SuffixTrie<>(Arrays.asList("ab", "ac"));
+        SuffixTrie<String> ast = new SuffixTrie<>(Stream.of("ab", "ac"));
         MatchingResultSet<String> res = ast.search("a");
 
         assertEquals(0, getMatchingIndex(res, "ab", 0, 1));
@@ -35,7 +36,7 @@ public class SuffixTrieTest {
 
     @Test
     public void should_find_any_matches_of_substring_for_all_inputs() {
-        SuffixTrie<String> ast = new SuffixTrie<>(Arrays.asList("ab", "ac"));
+        SuffixTrie<String> ast = new SuffixTrie<>(Stream.of("ab", "ac"));
 
         assertEquals(0, getMatchingIndex(ast.search("b"), "ab", 1, 2));
         assertEquals(0, getMatchingIndex(ast.search("c"), "ac", 1, 2));
@@ -44,7 +45,7 @@ public class SuffixTrieTest {
 
     @Test
     public void should_find_all_substrings_non_overlapped() {
-        SuffixTrie<String> ast = new SuffixTrie<>(Collections.singletonList("abc"));
+        SuffixTrie<String> ast = new SuffixTrie<>(Stream.of("abc"));
 
         assertEquals(0, getMatchingIndex(ast.search("abc"), "abc", 0, 3));
         assertEquals(0, getMatchingIndex(ast.search("ab"), "abc", 0, 2));
@@ -57,7 +58,7 @@ public class SuffixTrieTest {
 
     @Test
     public void should_find_all_substrings_overlapped() {
-        SuffixTrie<String> ast = new SuffixTrie<>(Collections.singletonList("aaa"));
+        SuffixTrie<String> ast = new SuffixTrie<>(Stream.of("aaa"));
 
         assertEquals(0, getMatchingIndex(ast.search("aaa"), "aaa", 0, 3));
 
@@ -71,13 +72,13 @@ public class SuffixTrieTest {
 
     @Test
     public void should_return_empty_result_for_unknown_substring() {
-        SuffixTrie<String> ast = new SuffixTrie<>(Collections.singletonList("abc"));
+        SuffixTrie<String> ast = new SuffixTrie<>(Stream.of("abc"));
         assertTrue(ast.search("d").getResultSet().isEmpty());
     }
 
     @Test
     public void should_add_matchings_in_sorted_order() {
-        SuffixTrie<String> ast = new SuffixTrie<>(Collections.singletonList("aaa"));
+        SuffixTrie<String> ast = new SuffixTrie<>(Stream.of("aaa"));
         MatchingResultSet<String> res = ast.search("a");
 
         assertEquals(0, getMatchingIndex(res, "aaa", 0, 1));
@@ -87,8 +88,13 @@ public class SuffixTrieTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void should_return_unmodifiable_result() {
-        SuffixTrie<String> ast = new SuffixTrie<>(Collections.singletonList("abc"));
+        SuffixTrie<String> ast = new SuffixTrie<>(Stream.of("abc"));
         ast.search("d").add("a", 0, 1);
+    }
+
+    @Test
+    public void should_skip_null_words() {
+        SuffixTrie<String> ast = new SuffixTrie<>(Stream.of("abc", null));
     }
 
 }
