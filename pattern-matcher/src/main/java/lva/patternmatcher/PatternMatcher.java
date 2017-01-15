@@ -4,7 +4,7 @@ package lva.patternmatcher;
  * @author vlitvinenko
  */
 public class PatternMatcher <T extends CharSequence & Comparable<? super T>> {
-    private final PatternCommandTokenizer CommandTokenizer;
+    private final PatternCommandTokenizer commandTokenizer;
     private final Searchable<T> searchable;
 
     public PatternMatcher(Iterable<T> words) {
@@ -12,19 +12,19 @@ public class PatternMatcher <T extends CharSequence & Comparable<? super T>> {
     }
 
     PatternMatcher(PatternCommandTokenizer commandTokenizer, Searchable<T> searchable) {
-        this.CommandTokenizer = commandTokenizer;
+        this.commandTokenizer = commandTokenizer;
         this.searchable = searchable;
     }
 
     public MatchingResultSet<T> match(CharSequence pattern) {
         MatchingResultSet<T> resultSet = new MatchingResultSet<>();
 
-        CommandTokenizer.restart(pattern);
-        PatternCommandTokenizer.Command command = CommandTokenizer.nextCommand();
+        commandTokenizer.restart(pattern);
+        PatternCommandTokenizer.Command command = commandTokenizer.nextCommand();
 
         while (command != null) {
             resultSet = command.execute(resultSet, searchable.search(command.getPattern()));
-            command = CommandTokenizer.nextCommand();
+            command = commandTokenizer.nextCommand();
         }
 
         return resultSet;

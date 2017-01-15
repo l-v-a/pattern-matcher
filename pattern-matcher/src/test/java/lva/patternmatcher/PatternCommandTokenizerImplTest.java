@@ -23,6 +23,17 @@ public class PatternCommandTokenizerImplTest {
         assertTrue(command instanceof BeginPatternCommand);
     }
 
+    @Test
+    public void should_return_null_as_last_command() {
+        parser.restart("abc");
+        PatternCommandTokenizer.Command command = parser.nextCommand();
+        assertTrue(command instanceof BeginPatternCommand);
+
+        command = parser.nextCommand();
+        assertNull(command);
+    }
+
+
 
     @Test
     public void should_tokenize_begin_any() {

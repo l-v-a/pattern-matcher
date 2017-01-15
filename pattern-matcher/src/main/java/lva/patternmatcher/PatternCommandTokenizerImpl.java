@@ -70,6 +70,10 @@ class PatternCommandTokenizerImpl implements PatternCommandTokenizer {
             currentLexeme = scanner.next();
         }
 
+        if (prevCommand == currentCommand) {
+            currentCommand = null;
+        }
+
         if (fsm.getCurrentState() == State.EXP_STRICT) {
             throw new IllegalStateException("Unexpected state at EOF: " + fsm.getCurrentState());
         }
