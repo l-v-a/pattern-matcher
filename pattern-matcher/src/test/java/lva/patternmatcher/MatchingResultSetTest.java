@@ -59,7 +59,7 @@ public class MatchingResultSetTest {
     }
 
     @Test
-    public void should_remove_all_entries_when_filter_reurns_null() {
+    public void should_remove_all_entries_when_filter_returns_null() {
         MatchingResultSet<String> resultSet = new MatchingResultSet<String>()
             .add("a", 0, 1)
             .add("b", 0, 1);
