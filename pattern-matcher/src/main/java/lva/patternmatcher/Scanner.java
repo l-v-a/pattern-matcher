@@ -1,5 +1,8 @@
 package lva.patternmatcher;
 
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Queue;
@@ -10,6 +13,7 @@ import java.util.Queue;
  */
 class Scanner {
 
+    @EqualsAndHashCode
     static class Lexeme {
         enum Type {
             CONCATENATION,  // TODO: think about to rename ANY, AND, COMBINE
@@ -40,23 +44,6 @@ class Scanner {
         public String toString() {
             return value != null ? String.format("%s:%s", type.name(), value) :
                 String.format("%s", type.name());
-        }
-
-        // TODO: remove it - test only logic
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) return true;
-            if (o instanceof Lexeme) {
-                Lexeme l = (Lexeme) o;
-                return Objects.equals(type, l.type) && Objects.equals(value, l.value);
-            }
-            return false;
-        }
-
-        // TODO: remove it - test only logic
-        @Override
-        public int hashCode() {
-            return Objects.hash(type, value);
         }
 
         static Lexeme concatenation() {
@@ -169,8 +156,8 @@ class Scanner {
             .build();
     }
 
-    void restart(CharSequence newSequence) {
-        sequence = Objects.requireNonNull(newSequence);
+    void restart(@NonNull CharSequence newSequence) {
+        sequence = newSequence;
         currentCharIndex = 0;
         beginOfLexemeIndex = 0;
 
@@ -216,5 +203,4 @@ class Scanner {
 
         return CharClass.SYMBOL;
     }
-
 }
