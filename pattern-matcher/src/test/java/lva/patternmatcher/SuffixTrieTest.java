@@ -36,7 +36,18 @@ public class SuffixTrieTest {
             .add("ac", 0, 1);
 
         assertEquals(expected, res);
-     }
+    }
+
+    @Test
+    public void should_index_equals_word() {
+        SuffixTrie<String> ast = new SuffixTrie<>(Stream.of("ab", "ab"));
+        MatchingResultSet<String> res = ast.search("a");
+
+        MatchingResultSet<String> expected = new MatchingResultSet<String>()
+            .add("ab", 0, 1);
+        assertEquals(expected, res);
+    }
+
 
     @Test
     public void should_find_any_matches_of_substring_for_all_inputs() {

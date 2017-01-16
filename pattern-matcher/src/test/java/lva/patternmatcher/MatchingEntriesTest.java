@@ -76,11 +76,15 @@ public class MatchingEntriesTest {
         assertNull(entries.findNearestMatching(new Matching(3, 4)));
     }
 
-    @Test(expected=IllegalArgumentException.class)
     public void could_not_accept_lesser_matchings() {
         MatchingEntries entries = new MatchingEntries()
             .add(1, 2)
             .add(0, 1);
+
+        MatchingEntries expected = new MatchingEntries()
+            .add(1, 2);
+
+        assertEquals(expected, entries);
 
     }
 
