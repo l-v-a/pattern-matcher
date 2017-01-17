@@ -9,6 +9,7 @@ import java.util.stream.Stream;
  * @author vlitvinenko
  */
 class SuffixTrie<T extends CharSequence & Comparable<? super T>> implements Searchable<T> {
+    private static final String TERMINAL_SYMBOL = " ";
 
     private static class Node<T extends CharSequence & Comparable<? super T>> {
         final Map<Character, Node<T>> children = new HashMap<>();
@@ -22,19 +23,20 @@ class SuffixTrie<T extends CharSequence & Comparable<? super T>> implements Sear
             .forEach(this::addWord);
     }
 
-    // TODO: add trailing blank support
     private void addWord(@NonNull T word) {
         // add suffixes
-        for (int i = 0; i < word.length(); i++) {
+        CharSequence seq = new StringBuilder(word) // to avoid Object.toString() calling
+            .append(TERMINAL_SYMBOL).toString();
+        for (int i = 0; i < seq.length(); i++) {
 
             Node<T> node = rootNode;
             Node<T> prevNode = null;
             int suffixIndex = i;
 
             // find longest path
-            while (suffixIndex < word.length() && node != null) {
+            while (suffixIndex < seq.length() && node != null) {
                 prevNode = node;
-                node = node.children.get(word.charAt(suffixIndex));
+                node = node.children.get(seq.charAt(suffixIndex));
 
                 if (node != null) {
                     node.matchings.add(word, i, suffixIndex + 1);
@@ -45,11 +47,11 @@ class SuffixTrie<T extends CharSequence & Comparable<? super T>> implements Sear
 
             // add remaining nodes
             Objects.requireNonNull(prevNode);
-            for (; suffixIndex < word.length(); suffixIndex++) {
+            for (; suffixIndex < seq.length(); suffixIndex++) {
                 node = new Node<>();
 
                 node.matchings.add(word, i, suffixIndex + 1);
-                prevNode.children.put(word.charAt(suffixIndex), node);
+                prevNode.children.put(seq.charAt(suffixIndex), node);
 
                 prevNode = node;
             }
