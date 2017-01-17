@@ -8,6 +8,8 @@ import lva.patternmatcher.MatchingResultSet;
 import lva.patternmatcher.PatternMatcher;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -62,7 +64,10 @@ public class App {
         PatternMatcher<ClassName> matcher = new PatternMatcher<>(classNames);
         System.out.println("done");
 
-        MatchingResultSet<ClassName> res = matcher.match("Date ");
+        Instant start = Instant.now();
+        MatchingResultSet<ClassName> res = matcher.match("AB");
+        System.out.println("searching time ms: " + Duration.between(start, Instant.now()).toMillis());
+
         Map<ClassName, MatchingResultSet.MatchingEntries> resultSet = res.getResultSet();
 
         resultSet.forEach((className, entries) -> {
