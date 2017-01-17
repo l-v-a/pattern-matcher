@@ -55,11 +55,6 @@ class ClassName implements CharSequence, Comparable<ClassName> {
 public class App {
     public static void main(String ... args) throws IOException {
         ClassPath classPath = ClassPath.from(App.class.getClassLoader());
-//        classPath.getTopLevelClasses().stream().forEach(ci -> {
-//            System.out.println(ci.getName());
-//            System.out.println(ci.getSimpleName());
-//        });
-
         Stream<ClassName> classNames = classPath.getTopLevelClasses().stream()
             .map(ClassName::new);
 
@@ -67,8 +62,9 @@ public class App {
         PatternMatcher<ClassName> matcher = new PatternMatcher<>(classNames);
         System.out.println("done");
 
-        MatchingResultSet<ClassName> res = matcher.match("Date");
+        MatchingResultSet<ClassName> res = matcher.match("Date ");
         Map<ClassName, MatchingResultSet.MatchingEntries> resultSet = res.getResultSet();
+
         resultSet.forEach((className, entries) -> {
             System.out.println(className);
             List<MatchingResultSet.Matching> matchings = entries.getMatchings();
