@@ -14,9 +14,6 @@ abstract class AbstractPatternCommand implements PatternCommandTokenizer.Command
     private final CharSequence pattern;
 
     AbstractPatternCommand(@NonNull CharSequence pattern) {
-        if (pattern.length() == 0) {
-            throw new IllegalArgumentException("Empty pattern for command");
-        }
         this.pattern = pattern;
     }
 

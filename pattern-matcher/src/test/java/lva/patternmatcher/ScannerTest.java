@@ -20,9 +20,9 @@ public class ScannerTest {
     private final Scanner scanner = new Scanner();
 
     @Test
-    public void should_return_null_for_empty_sequence() {
+    public void should_return_NULL_lexeme_for_empty_sequence() {
         scanner.restart("");
-        assertNull(scanner.next());
+        assertSame(Lexeme.NULL, scanner.next());
     }
 
     @Test
@@ -31,6 +31,11 @@ public class ScannerTest {
         assertThat("**abc", list(scanner), is(list(concatenation(), concatenation(), literal("abc"))));
     }
 
+    @Test
+    public void should_parse_seq_that_starts_with_only_asterisk() {
+        scanner.restart("*");
+        assertThat("*", list(scanner), is(list(concatenation())));
+    }
 
     @Test
     public void should_parse_seq_that_starts_with_symbol() {
@@ -100,7 +105,7 @@ public class ScannerTest {
     private static List<Lexeme> list(Scanner scanner) {
         List<Lexeme> lexemes = new ArrayList<>();
         Lexeme lexeme = scanner.next();
-        while (lexeme != null) {
+        while (lexeme != Lexeme.NULL) {
             lexemes.add(lexeme);
             lexeme = scanner.next();
         }

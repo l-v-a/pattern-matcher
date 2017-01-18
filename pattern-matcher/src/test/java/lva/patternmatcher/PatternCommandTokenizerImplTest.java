@@ -80,4 +80,16 @@ public class PatternCommandTokenizerImplTest {
         assertTrue(command instanceof ExpressionStrictPatternCommand);
 
     }
+
+    @Test
+    public void should_tokenize_expression_only_any() {
+        parser.restart("*");
+
+        PatternCommandTokenizer.Command command = parser.nextCommand();
+        assertTrue(command instanceof BeginAnyPatternCommand);
+
+        command = parser.nextCommand();
+        assertNull(command);
+    }
+
 }

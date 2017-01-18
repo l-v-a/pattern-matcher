@@ -14,7 +14,8 @@ class PatternCommandTokenizerImpl implements PatternCommandTokenizer {
         BEGIN,
         BEGIN_ANY,
         EXP_ANY,
-        EXP_STRICT
+        EXP_STRICT,
+        FINISHED
     }
 
     private final Scanner scanner = new Scanner();
@@ -25,6 +26,7 @@ class PatternCommandTokenizerImpl implements PatternCommandTokenizer {
     PatternCommandTokenizerImpl() {
         this.fsm = new FiniteStateMachine.Builder<State, Lexeme.Type>()
             .setInitialState(State.INITIAL)
+            .setFinishedState(State.FINISHED)
             .addTransition(State.INITIAL, State.BEGIN, Lexeme.Type.LITERAL, ((from, to, event) -> {
                 currentCommand = new BeginPatternCommand(currentLexeme.getValue());
             }))
@@ -42,6 +44,13 @@ class PatternCommandTokenizerImpl implements PatternCommandTokenizer {
             .addTransition(State.EXP_STRICT, State.BEGIN, Lexeme.Type.LITERAL, ((from, to, event) -> {
                 currentCommand = new ExpressionStrictPatternCommand(currentLexeme.getValue());
             }))
+            .addTransition(State.INITIAL, State.FINISHED, Lexeme.Type.NULL)
+            .addTransition(State.BEGIN, State.FINISHED, Lexeme.Type.NULL)
+            .addTransition(State.BEGIN_ANY, State.FINISHED, Lexeme.Type.NULL, ((from, to, event) -> {
+                currentCommand = new BeginAnyPatternCommand("");
+            }))
+            .addTransition(State.EXP_ANY, State.FINISHED, Lexeme.Type.NULL)
+            .addTransition(State.EXP_STRICT, State.FINISHED, Lexeme.Type.NULL)
             .build();
     }
 
@@ -66,17 +75,13 @@ class PatternCommandTokenizerImpl implements PatternCommandTokenizer {
     private void tokenize() {
         Command prevCommand = currentCommand;
 
-        while (currentLexeme != null && prevCommand == currentCommand) {
+        while (!fsm.isFinished() && prevCommand == currentCommand) {
             fsm.dispatch(currentLexeme.getType());
             currentLexeme = scanner.next();
         }
 
         if (prevCommand == currentCommand) {
             currentCommand = null;
-        }
-
-        if (fsm.getCurrentState() == State.EXP_STRICT) {
-            throw new IllegalStateException("Unexpected state at EOF: " + fsm.getCurrentState());
         }
     }
 }

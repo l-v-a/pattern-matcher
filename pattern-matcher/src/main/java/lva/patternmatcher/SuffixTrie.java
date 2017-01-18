@@ -1,6 +1,7 @@
 package lva.patternmatcher;
 
 import lombok.NonNull;
+import org.omg.CORBA.TRANSACTION_MODE;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -61,6 +62,8 @@ class SuffixTrie<T extends CharSequence & Comparable<? super T>> implements Sear
 
     @Override
     public MatchingResultSet<T> search(@NonNull CharSequence pattern) {
+        pattern = pattern.length() == 0 ? TERMINAL_SYMBOL : pattern;
+
         Node<T> node = rootNode;
         for (int i = 0; i < pattern.length() && node != null; i++) {
             node = node.children.get(pattern.charAt(i));

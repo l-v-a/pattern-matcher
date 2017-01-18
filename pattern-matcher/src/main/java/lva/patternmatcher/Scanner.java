@@ -15,10 +15,15 @@ class Scanner {
 
     @EqualsAndHashCode
     static class Lexeme {
+        static Lexeme NULL = new Lexeme(Type.NULL);
+        static Lexeme CONCATENATION = new Lexeme(Type.CONCATENATION);
+        static Lexeme STRICT_CONCATENATION = new Lexeme(Type.STRICT_CONCATENATION);
+
         enum Type {
             CONCATENATION,  // TODO: think about to rename ANY, AND, COMBINE
             STRICT_CONCATENATION,
-            LITERAL
+            LITERAL,
+            NULL
         }
         private final Type type;
         private final CharSequence value;
@@ -47,11 +52,11 @@ class Scanner {
         }
 
         static Lexeme concatenation() {
-            return new Lexeme(Type.CONCATENATION);
+            return CONCATENATION;
         }
 
         static Lexeme strictConcatenation() {
-            return new Lexeme(Type.STRICT_CONCATENATION);
+            return STRICT_CONCATENATION;
         }
 
         static Lexeme literal(CharSequence value) {
@@ -169,7 +174,8 @@ class Scanner {
         if (currentLexemes.isEmpty()) {
             parse();
         }
-        return currentLexemes.poll();
+        Lexeme lexeme = currentLexemes.poll();
+        return lexeme != null ? lexeme : Lexeme.NULL;
     }
 
     private boolean parse() {

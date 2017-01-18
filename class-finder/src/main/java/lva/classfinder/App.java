@@ -76,6 +76,7 @@ public class App {
                     printer.clear();
 
                     printer.setAttribute(Attribute.DARK);
+                    printer.setForegroundColor(FColor.WHITE);
                     printer.print(String.format(" (%s)%n", className.getPackageName()));
 
                     printer.clear();

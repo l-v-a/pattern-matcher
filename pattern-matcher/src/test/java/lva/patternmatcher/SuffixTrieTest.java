@@ -39,6 +39,18 @@ public class SuffixTrieTest {
     }
 
     @Test
+    public void should_find_all_words_for_empty_pattern() {
+        SuffixTrie<String> ast = new SuffixTrie<>(Stream.of("ab", "ac"));
+        MatchingResultSet<String> res = ast.search("");
+
+        MatchingResultSet<String> expected = new MatchingResultSet<String>()
+            .add("ab", 2, 3)
+            .add("ac", 2, 3);
+
+        assertEquals(expected, res);
+    }
+
+    @Test
     public void should_index_equals_word() {
         SuffixTrie<String> ast = new SuffixTrie<>(Stream.of("ab", "ab"));
         MatchingResultSet<String> res = ast.search("a");
