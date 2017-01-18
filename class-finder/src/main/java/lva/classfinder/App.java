@@ -1,55 +1,26 @@
 package lva.classfinder;
 
+import com.diogonunes.jcdp.color.ColoredPrinter;
+import com.diogonunes.jcdp.color.api.Ansi;
+import com.diogonunes.jcdp.color.api.Ansi.Attribute;
+import com.diogonunes.jcdp.color.api.Ansi.BColor;
+import com.diogonunes.jcdp.color.api.Ansi.FColor;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import lombok.NonNull;
 import lombok.ToString;
+import lombok.Getter;
 import lva.patternmatcher.MatchingResultSet;
 import lva.patternmatcher.PatternMatcher;
 
+import java.io.Console;
 import java.io.IOException;
+import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
-
-@ToString
-class ClassName implements CharSequence, Comparable<ClassName> {
-    private final String simpleName;
-    private final String packageName;
-
-    ClassName(@NonNull ClassInfo classInfo) {
-        this.simpleName = classInfo.getSimpleName();
-        this.packageName = classInfo.getPackageName();
-    }
-
-
-    @Override
-    public int length() {
-        return simpleName.length();
-    }
-
-    @Override
-    public char charAt(int index) {
-        return simpleName.charAt(index);
-    }
-
-    @Override
-    public CharSequence subSequence(int start, int end) {
-        return simpleName.subSequence(start, end);
-    }
-
-    @Override
-    public int compareTo(ClassName className) {
-        int res = simpleName.compareTo(className.simpleName);
-        if (res == 0) {
-            res = packageName.compareTo(className.packageName);
-        }
-        return res;
-    }
-}
 
 /**
  * @author vlitvinenko
@@ -60,21 +31,58 @@ public class App {
         Stream<ClassName> classNames = classPath.getTopLevelClasses().stream()
             .map(ClassName::new);
 
-        System.out.print("loading...");
+        System.out.print("loading ... ");
         PatternMatcher<ClassName> matcher = new PatternMatcher<>(classNames);
         System.out.println("done");
 
-        Instant start = Instant.now();
-        MatchingResultSet<ClassName> res = matcher.match("AB");
-        System.out.println("searching time ms: " + Duration.between(start, Instant.now()).toMillis());
+        Scanner scanner = new Scanner(System.in);
+        ColoredPrinter printer = new ColoredPrinter.Builder(1, false)
+            .build();
 
-        Map<ClassName, MatchingResultSet.MatchingEntries> resultSet = res.getResultSet();
+        try {
 
-        resultSet.forEach((className, entries) -> {
-            System.out.println(className);
-            List<MatchingResultSet.Matching> matchings = entries.getMatchings();
-            matchings.forEach(m -> System.out.println(m.getFrom() + ", " + m.getTo()));
-            System.out.println("-------------");
-        });
+            while (true) {
+                System.out.print("> ");
+                String pattern = scanner.nextLine();
+
+                Instant start = Instant.now();
+                System.out.printf("searching for '%s' ... ", pattern);
+                MatchingResultSet<ClassName> res = matcher.match(pattern);
+                System.out.println("done in ms: " + Duration.between(start, Instant.now()).toMillis());
+
+                Map<ClassName, MatchingResultSet.MatchingEntries> resultSet = res.getResultSet();
+
+                resultSet.forEach((className, entries) -> {
+                    printer.setAttribute(Attribute.LIGHT);
+
+                    String simpleName = className.getSimpleName();
+                    int from = 0;
+
+                    for (MatchingResultSet.Matching m : entries.getMatchings()) {
+                        printer.setForegroundColor(FColor.WHITE);
+                        printer.print(simpleName.substring(from, m.getFrom()));
+                        printer.setForegroundColor(FColor.RED);
+
+                        from = Math.min(m.getTo(), simpleName.length());
+                        printer.print(simpleName.substring(m.getFrom(), from));
+
+                    }
+
+                    if (from < simpleName.length()) {
+                        printer.setForegroundColor(FColor.WHITE);
+                        printer.print(simpleName.substring(from, simpleName.length()));
+                    }
+
+                    printer.clear();
+
+                    printer.setAttribute(Attribute.DARK);
+                    printer.print(String.format(" (%s)%n", className.getPackageName()));
+
+                    printer.clear();
+                });
+            }
+        } finally {
+            printer.clear();
+        }
     }
 }
