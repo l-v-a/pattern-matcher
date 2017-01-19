@@ -1,25 +1,24 @@
 package lva.classfinder;
 
-import com.diogonunes.jcdp.color.ColoredPrinter;
-import com.diogonunes.jcdp.color.api.Ansi;
-import com.diogonunes.jcdp.color.api.Ansi.Attribute;
-import com.diogonunes.jcdp.color.api.Ansi.BColor;
-import com.diogonunes.jcdp.color.api.Ansi.FColor;
 import com.google.common.reflect.ClassPath;
-import com.google.common.reflect.ClassPath.ClassInfo;
-import lombok.NonNull;
-import lombok.ToString;
-import lombok.Getter;
 import lva.patternmatcher.MatchingResultSet;
 import lva.patternmatcher.PatternMatcher;
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.Ansi.Attribute;
+import org.fusesource.jansi.AnsiConsole;
 
-import java.io.Console;
 import java.io.IOException;
-import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Stream;
+
+import static java.lang.String.format;
+import static org.fusesource.jansi.Ansi.Attribute.INTENSITY_BOLD;
+import static org.fusesource.jansi.Ansi.Attribute.INTENSITY_BOLD_OFF;
+import static org.fusesource.jansi.Ansi.Color.*;
+import static org.fusesource.jansi.Ansi.ansi;
 
 
 /**
@@ -36,54 +35,46 @@ public class App {
         System.out.println("done");
 
         Scanner scanner = new Scanner(System.in);
-        ColoredPrinter printer = new ColoredPrinter.Builder(1, false)
-            .build();
+        AnsiConsole.systemInstall();
 
         try {
 
             while (true) {
-                System.out.print("> ");
+                print("> ", DEFAULT, INTENSITY_BOLD);
                 String pattern = scanner.nextLine();
 
+                print(format("searching for '%s' ... ", pattern), DEFAULT, INTENSITY_BOLD);
                 Instant start = Instant.now();
-                System.out.printf("searching for '%s' ... ", pattern);
                 MatchingResultSet<ClassName> res = matcher.match(pattern);
-                System.out.println("done in ms: " + Duration.between(start, Instant.now()).toMillis());
+                print(format("done in %d ms%n", Duration.between(start, Instant.now()).toMillis()), DEFAULT, INTENSITY_BOLD);
 
                 Map<ClassName, MatchingResultSet.MatchingEntries> resultSet = res.getResultSet();
 
                 resultSet.forEach((className, entries) -> {
-                    printer.setAttribute(Attribute.LIGHT);
-
                     String simpleName = className.getSimpleName();
                     int from = 0;
 
                     for (MatchingResultSet.Matching m : entries.getMatchings()) {
-                        printer.setForegroundColor(FColor.WHITE);
-                        printer.print(simpleName.substring(from, m.getFrom()));
-                        printer.setForegroundColor(FColor.RED);
+                        print(simpleName.substring(from, m.getFrom()), WHITE, INTENSITY_BOLD);
 
                         from = Math.min(m.getTo(), simpleName.length());
-                        printer.print(simpleName.substring(m.getFrom(), from));
-
+                        print(simpleName.substring(m.getFrom(), from), RED, INTENSITY_BOLD);
                     }
 
                     if (from < simpleName.length()) {
-                        printer.setForegroundColor(FColor.WHITE);
-                        printer.print(simpleName.substring(from, simpleName.length()));
+                        print(simpleName.substring(from, simpleName.length()), WHITE, INTENSITY_BOLD);
                     }
 
-                    printer.clear();
-
-                    printer.setAttribute(Attribute.DARK);
-                    printer.setForegroundColor(FColor.WHITE);
-                    printer.print(String.format(" (%s)%n", className.getPackageName()));
-
-                    printer.clear();
+                    print(format(" (%s)%n", className.getPackageName()), WHITE, INTENSITY_BOLD_OFF);
                 });
             }
         } finally {
-            printer.clear();
+            AnsiConsole.systemUninstall();
         }
+    }
+
+    private static void print(String msg, Ansi.Color fgColor, Attribute attribute) {
+        AnsiConsole.out.print(ansi().fg(fgColor).a(attribute).a(msg).reset());
+        AnsiConsole.out.flush();
     }
 }
