@@ -7,6 +7,9 @@ import java.util.*;
 import java.util.stream.Stream;
 
 /**
+ * Represents annotated suffix trie (AST).
+ * Used to fast searching sub-sequence occurrence in provided words.
+ *
  * @author vlitvinenko
  */
 class SuffixTrie<T extends CharSequence & Comparable<? super T>> implements Searchable<T> {
@@ -19,6 +22,11 @@ class SuffixTrie<T extends CharSequence & Comparable<? super T>> implements Sear
 
     private final Node<T> rootNode = new Node<>();
 
+    /**
+     * Constructs AST from stream of {@code words}.
+     *
+     * @param words - stream of words to be added
+     */
     SuffixTrie(@NonNull Stream<T> words) {
         words.filter(Objects::nonNull)
             .forEach(this::addWord);
@@ -60,6 +68,12 @@ class SuffixTrie<T extends CharSequence & Comparable<? super T>> implements Sear
     }
 
 
+    /**
+     * Searches for all occurrences of passed substring {@code pattern}.
+     *
+     * @param pattern - substring to be searched
+     * @return mathcig result set that contains all occurrences of substring within provided words
+     */
     @Override
     public MatchingResultSet<T> search(@NonNull CharSequence pattern) {
         pattern = pattern.length() == 0 ? TERMINAL_SYMBOL : pattern;

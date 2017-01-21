@@ -7,8 +7,9 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Queue;
 
-// TODO: think about to implement Iterable<Lexeme>
 /**
+ * Represents FSM-based lexeme scanner. Used to tokenize pattern to further processing.
+ *
  * @author vlitvinenko
  */
 class Scanner {

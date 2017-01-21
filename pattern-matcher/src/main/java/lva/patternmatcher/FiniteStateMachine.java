@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
+ * Provides finite state machine implementation.
+ *
  * @author vlitvinenko
  */
 

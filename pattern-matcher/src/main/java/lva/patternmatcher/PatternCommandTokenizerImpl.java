@@ -6,6 +6,8 @@ import lva.patternmatcher.Scanner.Lexeme;
 import java.util.Objects;
 
 /**
+ * FSM-based pattern tokenizer implementation.
+ *
  * @author vlitvinenko
  */
 class PatternCommandTokenizerImpl implements PatternCommandTokenizer {

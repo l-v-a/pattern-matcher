@@ -10,6 +10,8 @@ import java.util.function.BiFunction;
 
 
 /**
+ * Represents matching results for some sequence, that includes matched words with list of occurrence indexes in each.
+ *
  * @author vlitvinenko
  */
 @EqualsAndHashCode
@@ -17,9 +19,18 @@ import java.util.function.BiFunction;
 public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     private static final MatchingResultSet EMPTY = unmodifiable(new MatchingResultSet());
 
+    /**
+     * Occurrence indexes within sequence.
+     */
     @Data
     public static class Matching {
+        /**
+         * beginning index, inclusive
+         */
         private final int from;
+        /**
+         * ending index, exclusive
+         */
         private final int to;
 
         @Override
@@ -29,6 +40,9 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     }
 
 
+    /**
+     * Provides list of matchings (occurrence indexes)
+     */
     @EqualsAndHashCode
     @ToString
     public static class MatchingEntries {
@@ -42,6 +56,9 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
             matchings = new ArrayList<>(other.matchings);
         }
 
+        /**
+         * @return list of matchings.
+         */
         public List<Matching> getMatchings() {
             return Collections.unmodifiableList(matchings);
         }
@@ -89,6 +106,12 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         this.resultSet = matchingEntriesMap;
     }
 
+    /**
+     * Returns matching result set, that contains a map of matched words to their lists of lower and upper bounds intervals,
+     * that represents occurrence indexes within corresponding word.
+     *
+     * @return matching result set
+     */
     public Map<T, MatchingEntries> getResultSet() {
         return Collections.unmodifiableMap(resultSet);
     }

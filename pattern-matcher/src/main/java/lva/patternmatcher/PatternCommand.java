@@ -7,6 +7,8 @@ import lva.patternmatcher.MatchingResultSet.MatchingEntries;
 import java.util.*;
 
 /**
+ * Base Command implementation for all kinds of supported patterns.
+ *
  * @author vlitvinenko
  */
 
@@ -23,6 +25,10 @@ abstract class AbstractPatternCommand implements PatternCommandTokenizer.Command
     }
 }
 
+/**
+ * Provides command implementation for pattern that matches begin of sequence
+ * (e.g. 'ab' part of 'ab*' pattern).
+ */
 class BeginPatternCommand extends AbstractPatternCommand {
     BeginPatternCommand(CharSequence pattern) {
         super(pattern);
@@ -43,6 +49,10 @@ class BeginPatternCommand extends AbstractPatternCommand {
     }
 }
 
+/**
+ * Provides command implementation for pattern that matches any substring
+ * (e.g. 'ab' part of '*ab*' pattern)
+ */
 class BeginAnyPatternCommand extends AbstractPatternCommand {
     BeginAnyPatternCommand(CharSequence pattern) {
         super(pattern);
@@ -63,6 +73,11 @@ class BeginAnyPatternCommand extends AbstractPatternCommand {
     }
 }
 
+/**
+ * Provides command implementation for pattern that matches any occurrences of {@code pattern }
+ * and restricts current result set {@code l} with it by nearest matching rule.
+ * (e.g. 'b' part of 'a*b' pattern)
+ */
 class ExpressionAnyPatternCommand extends AbstractPatternCommand {
     ExpressionAnyPatternCommand(CharSequence pattern) {
         super(pattern);
@@ -86,6 +101,11 @@ class ExpressionAnyPatternCommand extends AbstractPatternCommand {
     }
 }
 
+/**
+ * Provides command implementation for pattern that matches any occurrences of {@code pattern }
+ * and restricts current result set {@code l} with it by nearest capital symbol matching rule.
+ * (e.g. 'B' part of 'AB' pattern)
+ */
 class ExpressionStrictPatternCommand extends AbstractPatternCommand {
     ExpressionStrictPatternCommand(CharSequence pattern) {
         super(pattern);
