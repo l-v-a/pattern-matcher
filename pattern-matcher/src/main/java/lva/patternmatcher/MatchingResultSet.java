@@ -17,8 +17,6 @@ import java.util.function.BiFunction;
 @EqualsAndHashCode
 @ToString
 public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
-    private static final MatchingResultSet EMPTY = unmodifiable(new MatchingResultSet());
-
     /**
      * Occurrence indexes within sequence.
      */
@@ -150,9 +148,8 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     }
 
 
-    @SuppressWarnings("unchecked")
     static <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> emptyResultSet() {
-        return (MatchingResultSet<T>) EMPTY;
+        return unmodifiable(new MatchingResultSet<T>());
     }
 
     static <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> unmodifiable(MatchingResultSet<T> m) {
