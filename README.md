@@ -1,7 +1,7 @@
 # pattern-matcher
 Annotated suffix tree (AST) based pattern matching library.
 
-Searches by given stream of words with using pattern rules.
+Searches within given stream of words with using of pattern rules.
 
 Available patterns are:
 *   Capital letters, i.e. ABC - matches CamelCase letters. For example, ABC matches with <b>A</b>xxx<b>B</b>xxxx<b>C</b>
@@ -9,3 +9,23 @@ Available patterns are:
 *   Asterisk <i>*</i> matches with any sequence, e.g. *a*b matches with xxxx<b>a</b>xxxx<b>b</b>yyy and <b>ab</b>
 *   Blank at the end of pattern matches with the end of word, e.g. '*ab ' matches with xxxx<b>ab</b>, but not with xxxxaby
 
+
+##Usage Example
+
+```java
+// load form stream of words
+PatternMatcher<String> matcher = new PatternMatcher<>(
+    Stream.of("AxB", "AyyBcC", "AzzzBdCD")
+);
+
+// search by pattern 'AB'
+MatchingResultSet<String> res = matcher.match("AB");
+
+// dump result
+res.getResultSet().forEach((word, entries) -> {
+    System.out.print(word + " : ");
+    entries.getMatchings().forEach(System.out::print);
+    System.out.println();
+});
+
+```
