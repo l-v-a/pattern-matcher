@@ -15,7 +15,7 @@ Available patterns are:
 ```java
 // load form stream of words
 PatternMatcher<String> matcher = new PatternMatcher<>(
-    Stream.of("AxB", "AyyBcC", "AzzzBdCD")
+    Stream.of("AxB", "AyyBcC", "AzzzBdCD", "BCD")
 );
 
 // search by pattern 'AB'
@@ -28,4 +28,11 @@ res.getResultSet().forEach((word, entries) -> {
     System.out.println();
 });
 
+```
+
+The code above outputs all matched words with intervals of each matching, e.g.:
+```
+AxB : [0 , 1)[2 , 3)
+AyyBcC : [0 , 1)[3 , 4)
+AzzzBdCD : [0 , 1)[4 , 5)
 ```
