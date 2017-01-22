@@ -41,7 +41,7 @@ class BeginPatternCommand extends AbstractPatternCommand {
         return r.filter((word, entries) ->
             entries.getFirstMatching()
                 .filter(matching -> matching.getFrom() == 0)
-                .map(m -> new MatchingEntries().add(m))
+                .map(matching -> new MatchingEntries().add(matching))
         );
     }
 }
