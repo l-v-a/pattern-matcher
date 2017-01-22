@@ -68,22 +68,22 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         }
 
         MatchingEntries add(@NonNull Matching matching) {
-            Matching lastMatching = getLastMatching();
+            Matching lastMatching  = getLastMatching().orElse(null);
             if (lastMatching == null || lastMatching.getFrom() < matching.getFrom()) {
                 matchings.add(matching);
             }
             return this;
         }
 
-        Matching getFirstMatching() {
-            return matchings.isEmpty() ? null : matchings.get(0);
+        Optional<Matching> getFirstMatching() {
+            return Optional.ofNullable(matchings.isEmpty() ? null : matchings.get(0));
         }
 
-        Matching getLastMatching() {
-            return matchings.isEmpty() ? null : matchings.get(matchings.size() - 1);
+        Optional<Matching> getLastMatching() {
+            return Optional.ofNullable(matchings.isEmpty() ? null : matchings.get(matchings.size() - 1));
         }
 
-        Matching findNearestMatching(@NonNull Matching matching) {
+        Optional<Matching> findNearestMatching(@NonNull Matching matching) {
             // search for nearest entry (lists are sorted)
             Matching searchMatching = new Matching(matching.getTo(), matching.getTo());
             int idx = Collections.binarySearch(matchings, searchMatching, (m1, m2) ->
@@ -91,7 +91,7 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
             );
 
             idx = idx < 0 ? -idx - 1 : idx;
-            return idx < matchings.size() ? matchings.get(idx) : null;
+            return Optional.ofNullable(idx < matchings.size() ? matchings.get(idx) : null);
         }
 
     }
@@ -121,10 +121,10 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         return this;
     }
 
-    MatchingResultSet<T> filter(BiFunction<? super T, MatchingEntries, MatchingEntries> filter) {
+    MatchingResultSet<T> filter(BiFunction<? super T, MatchingEntries, Optional<MatchingEntries>> filter) {
         MatchingResultSet<T> result = new MatchingResultSet<>();
         resultSet.forEach((word, entries) -> {
-            Optional.ofNullable(filter.apply(word, entries)).ifPresent((value) -> {
+            filter.apply(word, entries).ifPresent((value) -> {
                 result.resultSet.put(word, value);
             });
         });
@@ -134,14 +134,14 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
 
     @FunctionalInterface
     interface CombineFunction <T> {
-        MatchingEntries apply(T t, MatchingEntries entriesLeft, MatchingEntries entriesRight);
+        Optional<MatchingEntries> apply(T t, MatchingEntries entriesLeft, MatchingEntries entriesRight);
     }
 
     MatchingResultSet<T> combine(MatchingResultSet<T> other, CombineFunction<? super T> combineFunction) {
         MatchingResultSet<T> result = new MatchingResultSet<>();
         resultSet.forEach((word, entries) -> {
             Optional.ofNullable(other.resultSet.get(word)).ifPresent((entriesOther) -> {
-                Optional.ofNullable(combineFunction.apply(word, entries, entriesOther)).ifPresent((combinedEntries) -> {
+                combineFunction.apply(word, entries, entriesOther).ifPresent((combinedEntries) -> {
                     result.resultSet.put(word, combinedEntries);
                 });
             });

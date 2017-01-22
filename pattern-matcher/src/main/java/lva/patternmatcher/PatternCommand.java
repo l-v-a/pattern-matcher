@@ -38,14 +38,11 @@ class BeginPatternCommand extends AbstractPatternCommand {
     public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
-        return r.filter((word, entries) -> {
-            Matching matching = entries.getFirstMatching();
-            if (matching != null && matching.getFrom() == 0) {
-                return new MatchingEntries()
-                    .add(matching);
-            }
-            return null;
-        });
+        return r.filter((word, entries) ->
+            entries.getFirstMatching()
+                .filter(matching -> matching.getFrom() == 0)
+                .map(m -> new MatchingEntries().add(m))
+        );
     }
 }
 
@@ -62,14 +59,10 @@ class BeginAnyPatternCommand extends AbstractPatternCommand {
     public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
-        return r.filter((word, entries) -> {
-            Matching matching = entries.getFirstMatching();
-            if (matching != null) {
-                return new MatchingEntries()
-                    .add(matching);
-            }
-            return null;
-        });
+        return r.filter((word, entries) ->
+            entries.getFirstMatching()
+                .map(matching -> new MatchingEntries().add(matching))
+        );
     }
 }
 
@@ -87,17 +80,11 @@ class ExpressionAnyPatternCommand extends AbstractPatternCommand {
     public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
-        return l.combine(r, (word, entriesLeft, entriesRight) -> {
-            Matching matchingLeft = entriesLeft.getLastMatching();
-            Matching matchingRight = matchingLeft != null ? entriesRight.findNearestMatching(matchingLeft) : null;
-
-            if (matchingRight != null) {
-                return new MatchingEntries(entriesLeft)
-                    .add(matchingRight);
-            }
-
-            return null;
-        });
+        return l.combine(r, (word, entriesLeft, entriesRight) ->
+            entriesLeft.getLastMatching()
+                .flatMap(entriesRight::findNearestMatching)
+                .map(nearestMatching -> new MatchingEntries(entriesLeft).add(nearestMatching))
+        );
     }
 }
 
@@ -115,27 +102,28 @@ class ExpressionStrictPatternCommand extends AbstractPatternCommand {
     public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
-        return l.combine(r, (word, entriesLeft, entriesRight) -> {
-            Matching matchingLeft = entriesLeft.getLastMatching();
-            Matching matchingRight = matchingLeft != null ? entriesRight.findNearestMatching(matchingLeft) : null;
+        return l.combine(r, (word, entriesLeft, entriesRight) ->
+            entriesLeft.getLastMatching()
+                .flatMap(matchingLeft ->
+                    entriesRight.findNearestMatching(matchingLeft)
+                        .filter(matchingRight -> isValid(word, matchingLeft, matchingRight))
+                        .map(matchingRight -> new MatchingEntries(entriesLeft).add(matchingRight))
+            )
+        );
 
-            if (matchingRight != null) {
-                // check pattern
-                int from = matchingLeft.getTo();
-                int to = matchingRight.getFrom();
-                boolean isValid = true;
+    }
 
-                for (int i = from; i < to && isValid; i++) {
-                    isValid = Character.isLowerCase(word.charAt(i));
-                }
+    private static <T extends CharSequence & Comparable<? super T>> boolean isValid(
+        T word, @NonNull Matching matchingLeft, @NonNull Matching matchingRight) {
+        // check pattern
+        int from = matchingLeft.getTo();
+        int to = matchingRight.getFrom();
+        boolean isValid = true;
 
-                if (isValid) {
-                    return new MatchingEntries(entriesLeft)
-                        .add(matchingRight);
-                }
-            }
+        for (int i = from; i < to && isValid; i++) {
+            isValid = Character.isLowerCase(word.charAt(i));
+        }
 
-            return null;
-        });
+        return isValid;
     }
 }

@@ -16,13 +16,13 @@ public class MatchingEntriesTest {
         MatchingEntries entries = new MatchingEntries()
             .add(0, 1)
             .add(1, 2);
-        assertEquals(new Matching(0, 1), entries.getFirstMatching());
+        assertEquals(new Matching(0, 1), entries.getFirstMatching().get());
     }
 
     @Test
-    public void should_return_null_for_first_matching_if_empty() {
+    public void should_return_empty_for_first_matching_if_empty() {
         MatchingEntries entries = new MatchingEntries();
-        assertNull(entries.getFirstMatching());
+        assertFalse(entries.getFirstMatching().isPresent());
     }
 
     @Test
@@ -30,13 +30,13 @@ public class MatchingEntriesTest {
         MatchingEntries entries = new MatchingEntries()
             .add(0, 1)
             .add(1, 2);
-        assertEquals(new Matching(1, 2), entries.getLastMatching());
+        assertEquals(new Matching(1, 2), entries.getLastMatching().orElse(null));
     }
 
     @Test
-    public void should_return_null_for_last_matching_if_empty() {
+    public void should_return_empty_for_last_matching_if_empty() {
         MatchingEntries entries = new MatchingEntries();
-        assertNull(entries.getLastMatching());
+        assertFalse(entries.getLastMatching().isPresent());
     }
 
     @Test
@@ -45,7 +45,7 @@ public class MatchingEntriesTest {
             .add(1, 2)
             .add(3, 4);
 
-        assertEquals(new Matching(1, 2), entries.findNearestMatching(new Matching(0, 1)));
+        assertEquals(new Matching(1, 2), entries.findNearestMatching(new Matching(0, 1)).orElse(null));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class MatchingEntriesTest {
             .add(2, 3)
             .add(3, 4);
 
-        assertEquals(new Matching(2, 3), entries.findNearestMatching(new Matching(0, 1)));
+        assertEquals(new Matching(2, 3), entries.findNearestMatching(new Matching(0, 1)).orElse(null));
     }
 
     @Test
@@ -64,16 +64,16 @@ public class MatchingEntriesTest {
             .add(30, 40)
             .add(50, 60);
 
-        assertEquals(new Matching(50, 60), entries.findNearestMatching(new Matching(41, 42)));
+        assertEquals(new Matching(50, 60), entries.findNearestMatching(new Matching(41, 42)).orElse(null));
     }
 
     @Test
-    public void should_return_null_if_no_nearest_matching() {
+    public void should_return_empty_if_no_nearest_matching() {
         MatchingEntries entries = new MatchingEntries()
             .add(1, 2)
             .add(3, 4);
 
-        assertNull(entries.findNearestMatching(new Matching(3, 4)));
+        assertFalse(entries.findNearestMatching(new Matching(3, 4)).isPresent());
     }
 
     public void could_not_accept_lesser_matchings() {

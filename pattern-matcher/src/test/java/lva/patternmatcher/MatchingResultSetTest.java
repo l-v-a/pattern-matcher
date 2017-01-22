@@ -2,6 +2,8 @@ package lva.patternmatcher;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 import static lva.patternmatcher.Utils.getMatchingIndex;
 import static org.junit.Assert.*;
 
@@ -65,8 +67,8 @@ public class MatchingResultSetTest {
             .add("b", 0, 1);
 
         MatchingResultSet<String> filteredResultSet = resultSet.filter((s, entries) -> {
-            if ("a".equals(s)) return entries;
-            return null;
+            if ("a".equals(s)) return Optional.of(entries);
+            return Optional.empty();
         });
 
         assertEquals(1, filteredResultSet.getResultSet().size());
@@ -80,7 +82,7 @@ public class MatchingResultSetTest {
         resultSet.add("b", 0, 1);
 
         MatchingResultSet<String> filteredResultSet = resultSet.filter((s, entries) ->
-            new MatchingResultSet.MatchingEntries().add(10, 20)
+            Optional.of(new MatchingResultSet.MatchingEntries().add(10, 20))
         );
 
         assertEquals(2, filteredResultSet.getResultSet().size());
@@ -100,8 +102,8 @@ public class MatchingResultSetTest {
         assertEquals(0, getMatchingIndex(resultSet, "b", 0, 1));
 
         MatchingResultSet<String> filteredResultSet = resultSet.filter((s, entries) -> {
-            if ("a".equals(s)) return entries;
-            return null;
+            if ("a".equals(s)) return Optional.of(entries);
+            return Optional.empty();
         });
 
         assertEquals(1, filteredResultSet.getResultSet().size());
@@ -130,8 +132,8 @@ public class MatchingResultSetTest {
 
 
         MatchingResultSet<String> combinedResultSet = resultSet1.combine(resultSet2, (s, entriesLeft, entriesRight) -> {
-            if ("a".equals(s)) return entriesLeft;
-            return null;
+            if ("a".equals(s)) return Optional.of(entriesLeft);
+            return Optional.empty();
         });
 
         assertEquals(1, combinedResultSet.getResultSet().size());
@@ -151,7 +153,7 @@ public class MatchingResultSetTest {
 
 
         MatchingResultSet<String> combinedResultSet = resultSet1.combine(resultSet2, (s, entriesLeft, entriesRight) ->
-            new MatchingResultSet.MatchingEntries().add(10, 20)
+            Optional.of(new MatchingResultSet.MatchingEntries().add(10, 20))
         );
 
         assertEquals(2, combinedResultSet.getResultSet().size());
@@ -178,7 +180,7 @@ public class MatchingResultSetTest {
         assertEquals(0, getMatchingIndex(resultSet2, "b", 0, 1));
 
         MatchingResultSet<String> combinedResultSet = resultSet1.combine(resultSet2, (s, entriesLeft, entriesRight) ->
-            new MatchingResultSet.MatchingEntries().add(10, 20)
+            Optional.of(new MatchingResultSet.MatchingEntries().add(10, 20))
         );
 
         assertFalse(combinedResultSet == resultSet1);
