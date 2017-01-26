@@ -16,7 +16,7 @@ public class PatternMatcher <T extends CharSequence & Comparable<? super T>> {
      * @param words - stream of words
      */
     public PatternMatcher(Stream<T> words) {
-        this(new PatternCommandTokenizerImpl(), new SuffixTrie<>(words));
+        this(new PatternCommandTokenizerImpl(), new SuffixTree<>(words));
     }
 
     PatternMatcher(PatternCommandTokenizer commandTokenizer, Searchable<T> searchable) {

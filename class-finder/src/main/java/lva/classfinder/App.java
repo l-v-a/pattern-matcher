@@ -35,6 +35,7 @@ public class App {
         System.out.println("done");
 
         Scanner scanner = new Scanner(System.in);
+
         AnsiConsole.systemInstall();
 
         try {
@@ -46,7 +47,8 @@ public class App {
                 print(format("searching for '%s' ... ", pattern), DEFAULT, INTENSITY_BOLD);
                 Instant start = Instant.now();
                 MatchingResultSet<ClassName> res = matcher.match(pattern);
-                print(format("done in %d ms%n", Duration.between(start, Instant.now()).toMillis()), DEFAULT, INTENSITY_BOLD);
+                Duration searchDuration = Duration.between(start, Instant.now());
+                print(format("done%n"), DEFAULT, INTENSITY_BOLD);
 
                 Map<ClassName, MatchingResultSet.MatchingEntries> resultSet = res.getResultSet();
 
@@ -67,6 +69,10 @@ public class App {
 
                     print(format(" (%s)%n", className.getPackageName()), WHITE, INTENSITY_BOLD_OFF);
                 });
+
+                print(format("%nsearching time: %d ms%nfound: %d%n",
+                    searchDuration.toMillis(), resultSet.size()), DEFAULT, INTENSITY_BOLD);
+
             }
         } finally {
             AnsiConsole.systemUninstall();

@@ -7,6 +7,9 @@ import lombok.ToString;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.UnaryOperator;
+
+import static java.util.Optional.ofNullable;
 
 
 /**
@@ -74,11 +77,11 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         }
 
         Optional<Matching> getFirstMatching() {
-            return Optional.ofNullable(matchings.isEmpty() ? null : matchings.get(0));
+            return ofNullable(matchings.isEmpty() ? null : matchings.get(0));
         }
 
         Optional<Matching> getLastMatching() {
-            return Optional.ofNullable(matchings.isEmpty() ? null : matchings.get(matchings.size() - 1));
+            return ofNullable(matchings.isEmpty() ? null : matchings.get(matchings.size() - 1));
         }
 
         Optional<Matching> findNearestMatching(@NonNull Matching matching) {
@@ -89,9 +92,25 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
             );
 
             idx = idx < 0 ? -idx - 1 : idx;
-            return Optional.ofNullable(idx < matchings.size() ? matchings.get(idx) : null);
+            return ofNullable(idx < matchings.size() ? matchings.get(idx) : null);
         }
 
+        MatchingEntries transform(UnaryOperator<Matching> fn) {
+            MatchingEntries newEntries = new MatchingEntries();
+            matchings.stream()
+                .map(fn)
+                .filter(Objects::nonNull)
+                .forEach(newEntries::add);
+            return newEntries;
+        }
+
+        MatchingEntries getLeft(int len) {
+            return transform(matching -> 0 <= len && len < matching.getTo() ? new Matching(matching.getFrom(), matching.getFrom() + len) : null);
+        }
+
+        MatchingEntries getRight(int len) {
+            return transform(matching -> matching.getFrom() + len <= matching.getTo() ? new Matching(matching.getFrom() + len, matching.getTo()) : null);
+        }
     }
 
     private final Map<T, MatchingEntries> resultSet;
@@ -119,6 +138,7 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         return this;
     }
 
+    // TODO: rename to transform
     MatchingResultSet<T> filter(BiFunction<? super T, MatchingEntries, Optional<MatchingEntries>> filter) {
         MatchingResultSet<T> result = new MatchingResultSet<>();
         resultSet.forEach((word, entries) -> {
@@ -138,7 +158,7 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     MatchingResultSet<T> combine(MatchingResultSet<T> other, CombineFunction<? super T> combineFunction) {
         MatchingResultSet<T> result = new MatchingResultSet<>();
         resultSet.forEach((word, entries) -> {
-            Optional.ofNullable(other.resultSet.get(word)).ifPresent((entriesOther) -> {
+            ofNullable(other.resultSet.get(word)).ifPresent((entriesOther) -> {
                 combineFunction.apply(word, entries, entriesOther).ifPresent((combinedEntries) -> {
                     result.resultSet.put(word, combinedEntries);
                 });
@@ -147,6 +167,19 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         return result;
     }
 
+    MatchingResultSet<T> getLeft(int len) {
+        return filter((word, entries) -> {
+            MatchingEntries entriesLeft = entries.getLeft(len);
+            return ofNullable(entriesLeft.matchings.isEmpty() ? null : entriesLeft);
+        });
+    }
+
+    MatchingResultSet<T> getRight(int len) {
+        return filter((word, entries) -> {
+            MatchingEntries entriesRight = entries.getRight(len);
+            return ofNullable(entriesRight.matchings.isEmpty() ? null : entriesRight);
+        });
+    }
 
     static <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> emptyResultSet() {
         return unmodifiable(new MatchingResultSet<T>());

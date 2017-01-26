@@ -76,6 +76,7 @@ public class MatchingEntriesTest {
         assertFalse(entries.findNearestMatching(new Matching(3, 4)).isPresent());
     }
 
+    @Test
     public void could_not_accept_lesser_matchings() {
         MatchingEntries entries = new MatchingEntries()
             .add(1, 2)
@@ -85,7 +86,53 @@ public class MatchingEntriesTest {
             .add(1, 2);
 
         assertEquals(expected, entries);
-
     }
+
+    @Test
+    public void should_return_left_part() {
+        MatchingEntries entries = new MatchingEntries()
+            .add(1, 4)
+            .add(2, 10);
+
+        MatchingEntries expected = new MatchingEntries()
+            .add(1, 2)
+            .add(2, 3);
+
+        assertEquals(expected, entries.getLeft(1));
+    }
+
+    @Test
+    public void should_return_empty_left_part_if_all_less() {
+        MatchingEntries entries = new MatchingEntries()
+            .add(1, 4)
+            .add(2, 10);
+
+        MatchingEntries expected = new MatchingEntries();
+        assertEquals(expected, entries.getLeft(10));
+    }
+
+    @Test
+    public void should_return_right_part() {
+        MatchingEntries entries = new MatchingEntries()
+            .add(1, 4)
+            .add(2, 10);
+
+        MatchingEntries expected = new MatchingEntries()
+            .add(2, 4)
+            .add(3, 10);
+
+        assertEquals(expected, entries.getRight(1));
+    }
+
+    @Test
+    public void should_return_empty_right_part_if_all_greater() {
+        MatchingEntries entries = new MatchingEntries()
+            .add(1, 4)
+            .add(2, 10);
+
+        MatchingEntries expected = new MatchingEntries();
+        assertEquals(expected, entries.getRight(10));
+    }
+
 
 }
