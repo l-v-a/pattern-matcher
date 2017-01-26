@@ -57,61 +57,61 @@ class SuffixTree<T extends CharSequence & Comparable<? super T>> implements Sear
 
     private void addWord(@NonNull T word) {
         // add suffixes
-        CharSequence sequence = new StringBuilder(word) // to avoid Object.toString() calling
+        CharSequence suffix = new StringBuilder(word) // to avoid Object.toString() calling
             .append(TERMINAL_SYMBOL).toString();
 
-        for (int i = 0; i < sequence.length(); i++) {
+        for (int i = 0; i < suffix.length(); i++) {
 
             Node<T> node = rootNode;
             Node<T> prevNode = node;
             int suffixIdx = i;
 
-            while (suffixIdx < sequence.length() &&
-                    (node = node.children.get(sequence.charAt(suffixIdx))) != null) {
+            while (suffixIdx < suffix.length() &&
+                    (node = node.children.get(suffix.charAt(suffixIdx))) != null) {
 
-                int nodeSequenceIdx = 0;
+                int sequenceIdx = 0;
                 int suffixStartIdx = suffixIdx;
 
                 // test for matching with node
-                while (nodeSequenceIdx < node.sequence.length() &&
-                    node.sequence.charAt(nodeSequenceIdx) == sequence.charAt(suffixIdx)) {
+                while (sequenceIdx < node.sequence.length() &&
+                    node.sequence.charAt(sequenceIdx) == suffix.charAt(suffixIdx)) {
 
                     suffixIdx++;
-                    nodeSequenceIdx++;
+                    sequenceIdx++;
                 }
 
-                if (nodeSequenceIdx == node.sequence.length()) {
-                    // full matching
+                if (sequenceIdx == node.sequence.length()) {
+                    // full matching with node sequence
                     node.matchings.add(word, suffixStartIdx, suffixIdx);
                 } else {
                     // partial matching
-                    // split nodes
-                    Node<T> nodeLeft = node.newLeft(nodeSequenceIdx);
-                    Node<T> nodeRight = node.newRight(nodeSequenceIdx);
+                    // split nodes: leftNode contains full matching, rightNode have not matchings with suffix
+                    // and newNode matches with suffix tail
+                    Node<T> nodeLeft = node.newLeft(sequenceIdx);
+                    nodeLeft.matchings.add(word, suffixStartIdx, suffixIdx);
+
+                    Node<T> nodeRight = node.newRight(sequenceIdx);
+
+                    Node<T> newNode = new Node<>(suffix.subSequence(suffixIdx, suffix.length()));
+                    newNode.matchings.add(word, suffixIdx, suffix.length());
 
                     nodeLeft.children.put(nodeRight.sequence.charAt(0), nodeRight);
                     nodeRight.children.putAll(node.children);
-
                     prevNode.children.put(nodeLeft.sequence.charAt(0), nodeLeft);
-
-                    Node<T> newNode = new Node<>(sequence.subSequence(suffixIdx, sequence.length()));
                     nodeLeft.children.put(newNode.sequence.charAt(0), newNode);
 
-                    nodeLeft.matchings.add(word, suffixStartIdx, suffixIdx);
-                    newNode.matchings.add(word, suffixIdx, sequence.length());
-
-                    suffixIdx = sequence.length();
+                    suffixIdx = suffix.length();
                 }
 
                 prevNode = node;
             }
 
-            if (suffixIdx < sequence.length()) {
+            if (suffixIdx < suffix.length()) {
                 Objects.requireNonNull(prevNode);
 
-                // append new node for tail of sequence
-                Node<T> newNode = new Node<>(sequence.subSequence(suffixIdx, sequence.length()));
-                newNode.matchings.add(word, suffixIdx, sequence.length());
+                // append new node for tail of suffix
+                Node<T> newNode = new Node<>(suffix.subSequence(suffixIdx, suffix.length()));
+                newNode.matchings.add(word, suffixIdx, suffix.length());
                 prevNode.children.put(newNode.sequence.charAt(0), newNode);
             }
         }
