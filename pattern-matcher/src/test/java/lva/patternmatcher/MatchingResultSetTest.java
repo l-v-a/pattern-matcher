@@ -212,7 +212,7 @@ public class MatchingResultSetTest {
             .add("a", 1, 2)
             .add("a", 2, 3);
 
-        assertEquals(expected, resultSet.getLeft(1));
+        assertEquals(expected, resultSet.splitLeft(1));
     }
 
     @Test
@@ -221,7 +221,7 @@ public class MatchingResultSetTest {
             .add("a", 1, 4)
             .add("a", 2, 10);
 
-        assertEquals(emptyResultSet(), resultSet.getLeft(-1));
+        assertEquals(emptyResultSet(), resultSet.splitLeft(-1));
     }
 
     @Test
@@ -234,7 +234,7 @@ public class MatchingResultSetTest {
             .add("a", 2, 4)
             .add("a", 3, 10);
 
-        assertEquals(expected, resultSet.getRight(1));
+        assertEquals(expected, resultSet.splitRight(1));
     }
 
     @Test
@@ -243,6 +243,20 @@ public class MatchingResultSetTest {
             .add("a", 1, 4)
             .add("a", 2, 10);
 
-        assertEquals(emptyResultSet(), resultSet.getRight(10));
+        assertEquals(emptyResultSet(), resultSet.splitRight(10));
     }
+
+    @Test
+    public void should_shift_resultset() {
+        MatchingResultSet<String> resultSet = new MatchingResultSet<String>()
+            .add("a", 1, 4)
+            .add("a", 2, 10);
+
+        MatchingResultSet<String> expected = new MatchingResultSet<String>()
+            .add("a", 2, 4)
+            .add("a", 3, 5);
+
+        assertEquals(expected, resultSet.shift(1, 2));
+    }
+
 }

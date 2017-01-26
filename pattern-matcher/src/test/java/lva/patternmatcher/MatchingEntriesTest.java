@@ -98,7 +98,7 @@ public class MatchingEntriesTest {
             .add(1, 2)
             .add(2, 3);
 
-        assertEquals(expected, entries.getLeft(1));
+        assertEquals(expected, entries.splitLeft(1));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class MatchingEntriesTest {
             .add(2, 10);
 
         MatchingEntries expected = new MatchingEntries();
-        assertEquals(expected, entries.getLeft(-1));
+        assertEquals(expected, entries.splitLeft(-1));
     }
 
     @Test
@@ -121,7 +121,7 @@ public class MatchingEntriesTest {
             .add(2, 4)
             .add(3, 10);
 
-        assertEquals(expected, entries.getRight(1));
+        assertEquals(expected, entries.splitRight(1));
     }
 
     @Test
@@ -131,7 +131,7 @@ public class MatchingEntriesTest {
             .add(2, 10);
 
         MatchingEntries expected = new MatchingEntries();
-        assertEquals(expected, entries.getRight(10));
+        assertEquals(expected, entries.splitRight(10));
     }
 
 

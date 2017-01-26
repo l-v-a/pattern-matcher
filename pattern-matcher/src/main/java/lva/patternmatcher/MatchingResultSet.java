@@ -102,16 +102,16 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
             return newEntries;
         }
 
-        MatchingEntries getLeft(int len) {
+        MatchingEntries splitLeft(int offset) {
             return transform(matching -> {
-                int to = matching.getFrom() + len;
+                int to = matching.getFrom() + offset;
                 return matching.getFrom() <= to ? new Matching(matching.getFrom(), to) : null;
             });
         }
 
-        MatchingEntries getRight(int len) {
+        MatchingEntries splitRight(int offset) {
             return transform(matching -> {
-                int from = matching.getFrom() + len;
+                int from = matching.getFrom() + offset;
                 return 0 <= from && from <= matching.getTo() ? new Matching(from, matching.getTo()) : null;
             });
         }
@@ -170,18 +170,26 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         return result;
     }
 
-    MatchingResultSet<T> getLeft(int len) {
+    MatchingResultSet<T> splitLeft(int offset) {
         return transform((word, entries) -> {
-            MatchingEntries entriesLeft = entries.getLeft(len);
+            MatchingEntries entriesLeft = entries.splitLeft(offset);
             return ofNullable(entriesLeft.matchings.isEmpty() ? null : entriesLeft);
         });
     }
 
-    MatchingResultSet<T> getRight(int len) {
+    MatchingResultSet<T> splitRight(int offset) {
         return transform((word, entries) -> {
-            MatchingEntries entriesRight = entries.getRight(len);
+            MatchingEntries entriesRight = entries.splitRight(offset);
             return ofNullable(entriesRight.matchings.isEmpty() ? null : entriesRight);
         });
+    }
+
+    MatchingResultSet<T> shift(int offset, int len) {
+        return transform((word, entries) ->
+            Optional.of(entries.transform(matching ->
+                new Matching(matching.getFrom() + offset, matching.getFrom() + offset + len)
+            ))
+        );
     }
 
     static <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> emptyResultSet() {

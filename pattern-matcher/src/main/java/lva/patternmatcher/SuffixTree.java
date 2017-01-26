@@ -34,11 +34,11 @@ class SuffixTree<T extends CharSequence & Comparable<? super T>> implements Sear
         }
 
         Node<T> newLeft(int len) {
-            return new Node<>(sequence.subSequence(0, len), new HashMap<>(), matchings.getLeft(len));
+            return new Node<>(sequence.subSequence(0, len), new HashMap<>(), matchings.splitLeft(len));
         }
 
         Node<T> newRight(int len) {
-            return new Node<>(sequence.subSequence(len, sequence.length()), new HashMap<>(), matchings.getRight(len));
+            return new Node<>(sequence.subSequence(len, sequence.length()), new HashMap<>(), matchings.splitRight(len));
         }
 
     }
@@ -150,13 +150,7 @@ class SuffixTree<T extends CharSequence & Comparable<? super T>> implements Sear
 
         if (node != null && patternIdx == pattern.length()) {
             // matches
-            int offset = pattern.length() - sequenceIdx;
-            int len = sequenceIdx;
-            return node.matchings.transform((word, entries) ->
-                Optional.of(entries.transform(matching ->
-                    new Matching(matching.getFrom() - offset, matching.getFrom() + len)
-                ))
-            );
+            return node.matchings.shift(sequenceIdx - pattern.length(), pattern.length());
         }
 
         return MatchingResultSet.emptyResultSet();

@@ -27,6 +27,18 @@ public class suffixTreeTest {
     }
 
     @Test
+    public void should_find_all_matches_of_substring_for_splitted_nodes() {
+        SuffixTree<String> ast = new SuffixTree<>(Stream.of("aaab"));
+        MatchingResultSet<String> res = ast.search("aa");
+
+        MatchingResultSet<String> expected = new MatchingResultSet<String>()
+            .add("aaab", 0, 2)
+            .add("aaab", 1, 3);
+
+        assertEquals(expected, res);
+    }
+
+    @Test
     public void should_find_all_matches_of_substring_for_all_inputs() {
         SuffixTree<String> ast = new SuffixTree<>(Stream.of("ab", "ac"));
         MatchingResultSet<String> res = ast.search("a");
