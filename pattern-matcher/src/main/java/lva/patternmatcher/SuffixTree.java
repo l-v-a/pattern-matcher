@@ -118,14 +118,6 @@ class SuffixTree<T extends CharSequence & Comparable<? super T>> implements Sear
 
     }
 
-    private static <T extends CharSequence & Comparable<? super T>> void dump(Node<T> node, String offset) {
-        System.out.printf("%s'%s' : %s %n", offset, node.sequence, node.matchings);
-        node.children.forEach((k, v) -> dump(v, offset + "\t"));
-    }
-
-    void dump() {
-        dump(rootNode, "");
-    }
     /**
      * Searches for all occurrences of passed substring {@code pattern}.
      *
