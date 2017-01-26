@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.Optional;
 
+import static lva.patternmatcher.MatchingResultSet.emptyResultSet;
 import static lva.patternmatcher.Utils.getMatchingIndex;
 import static org.junit.Assert.*;
 
@@ -61,33 +62,33 @@ public class MatchingResultSetTest {
     }
 
     @Test
-    public void should_remove_all_entries_when_filter_returns_null() {
+    public void should_remove_all_entries_when_mapping_returns_null() {
         MatchingResultSet<String> resultSet = new MatchingResultSet<String>()
             .add("a", 0, 1)
             .add("b", 0, 1);
 
-        MatchingResultSet<String> filteredResultSet = resultSet.filter((s, entries) -> {
+        MatchingResultSet<String> transformedResultSet = resultSet.transform((s, entries) -> {
             if ("a".equals(s)) return Optional.of(entries);
             return Optional.empty();
         });
 
-        assertEquals(1, filteredResultSet.getResultSet().size());
-        assertEquals(0, getMatchingIndex(filteredResultSet, "a", 0, 1));
+        assertEquals(1, transformedResultSet.getResultSet().size());
+        assertEquals(0, getMatchingIndex(transformedResultSet, "a", 0, 1));
     }
 
     @Test
-    public void should_replace_all_entries_when_filter_result() {
+    public void should_replace_all_entries_when_mapping_result() {
         MatchingResultSet<String> resultSet = new MatchingResultSet<>();
         resultSet.add("a", 0, 1);
         resultSet.add("b", 0, 1);
 
-        MatchingResultSet<String> filteredResultSet = resultSet.filter((s, entries) ->
+        MatchingResultSet<String> transformedResultSet = resultSet.transform((s, entries) ->
             Optional.of(new MatchingResultSet.MatchingEntries().add(10, 20))
         );
 
-        assertEquals(2, filteredResultSet.getResultSet().size());
-        assertEquals(0, getMatchingIndex(filteredResultSet, "a", 10, 20));
-        assertEquals(0, getMatchingIndex(filteredResultSet, "b", 10, 20));
+        assertEquals(2, transformedResultSet.getResultSet().size());
+        assertEquals(0, getMatchingIndex(transformedResultSet, "a", 10, 20));
+        assertEquals(0, getMatchingIndex(transformedResultSet, "b", 10, 20));
     }
 
 
@@ -101,18 +102,18 @@ public class MatchingResultSetTest {
         assertEquals(0, getMatchingIndex(resultSet, "a", 0, 1));
         assertEquals(0, getMatchingIndex(resultSet, "b", 0, 1));
 
-        MatchingResultSet<String> filteredResultSet = resultSet.filter((s, entries) -> {
+        MatchingResultSet<String> transformedResultSet = resultSet.transform((s, entries) -> {
             if ("a".equals(s)) return Optional.of(entries);
             return Optional.empty();
         });
 
-        assertEquals(1, filteredResultSet.getResultSet().size());
-        assertEquals(0, getMatchingIndex(filteredResultSet, "a", 0, 1));
+        assertEquals(1, transformedResultSet.getResultSet().size());
+        assertEquals(0, getMatchingIndex(transformedResultSet, "a", 0, 1));
 
-        assertFalse(resultSet == filteredResultSet);
+        assertFalse(resultSet == transformedResultSet);
 
-        assertEquals(1, filteredResultSet.getResultSet().size());
-        assertEquals(0, getMatchingIndex(filteredResultSet, "a", 0, 1));
+        assertEquals(1, transformedResultSet.getResultSet().size());
+        assertEquals(0, getMatchingIndex(transformedResultSet, "a", 0, 1));
 
         assertEquals(2, resultSet.getResultSet().size());
         assertEquals(0, getMatchingIndex(resultSet, "a", 0, 1));
@@ -200,4 +201,48 @@ public class MatchingResultSetTest {
 
     }
 
+
+    @Test
+    public void should_return_left_part() {
+        MatchingResultSet<String> resultSet = new MatchingResultSet<String>()
+            .add("a", 1, 4)
+            .add("a", 2, 10);
+
+        MatchingResultSet<String> expected = new MatchingResultSet<String>()
+            .add("a", 1, 2)
+            .add("a", 2, 3);
+
+        assertEquals(expected, resultSet.getLeft(1));
+    }
+
+    @Test
+    public void should_return_empty_left_part_if_out_of_bounds() {
+        MatchingResultSet<String> resultSet = new MatchingResultSet<String>()
+            .add("a", 1, 4)
+            .add("a", 2, 10);
+
+        assertEquals(emptyResultSet(), resultSet.getLeft(-1));
+    }
+
+    @Test
+    public void should_return_right_part() {
+        MatchingResultSet<String> resultSet = new MatchingResultSet<String>()
+            .add("a", 1, 4)
+            .add("a", 2, 10);
+
+        MatchingResultSet<String> expected = new MatchingResultSet<String>()
+            .add("a", 2, 4)
+            .add("a", 3, 10);
+
+        assertEquals(expected, resultSet.getRight(1));
+    }
+
+    @Test
+    public void should_return_empty_right_part_if_out_of_bounds() {
+        MatchingResultSet<String> resultSet = new MatchingResultSet<String>()
+            .add("a", 1, 4)
+            .add("a", 2, 10);
+
+        assertEquals(emptyResultSet(), resultSet.getRight(10));
+    }
 }

@@ -160,7 +160,7 @@ class SuffixTree<T extends CharSequence & Comparable<? super T>> implements Sear
             // matches
             int offset = pattern.length() - sequenceIdx;
             int len = sequenceIdx;
-            return node.matchings.filter((word, entries) ->
+            return node.matchings.transform((word, entries) ->
                 Optional.of(entries.transform(matching ->
                     new Matching(matching.getFrom() - offset, matching.getFrom() + len)
                 ))

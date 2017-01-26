@@ -4,8 +4,6 @@ import lombok.NonNull;
 import lva.patternmatcher.MatchingResultSet.Matching;
 import lva.patternmatcher.MatchingResultSet.MatchingEntries;
 
-import java.util.*;
-
 /**
  * Base Command implementation for all kinds of supported patterns.
  *
@@ -38,7 +36,7 @@ class BeginPatternCommand extends AbstractPatternCommand {
     public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
-        return r.filter((word, entries) ->
+        return r.transform((word, entries) ->
             entries.getFirstMatching()
                 .filter(matching -> matching.getFrom() == 0)
                 .map(matching -> new MatchingEntries().add(matching))
@@ -59,7 +57,7 @@ class BeginAnyPatternCommand extends AbstractPatternCommand {
     public <T extends CharSequence & Comparable<? super T>> MatchingResultSet<T> execute(
         MatchingResultSet<T> l, MatchingResultSet<T> r) {
 
-        return r.filter((word, entries) ->
+        return r.transform((word, entries) ->
             entries.getFirstMatching()
                 .map(matching -> new MatchingEntries().add(matching))
         );

@@ -102,13 +102,13 @@ public class MatchingEntriesTest {
     }
 
     @Test
-    public void should_return_empty_left_part_if_all_less() {
+    public void should_return_empty_left_part_if_out_of_bounds() {
         MatchingEntries entries = new MatchingEntries()
             .add(1, 4)
             .add(2, 10);
 
         MatchingEntries expected = new MatchingEntries();
-        assertEquals(expected, entries.getLeft(10));
+        assertEquals(expected, entries.getLeft(-1));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class MatchingEntriesTest {
     }
 
     @Test
-    public void should_return_empty_right_part_if_all_greater() {
+    public void should_return_empty_right_part_if_out_of_bounds() {
         MatchingEntries entries = new MatchingEntries()
             .add(1, 4)
             .add(2, 10);

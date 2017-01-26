@@ -95,21 +95,25 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
             return ofNullable(idx < matchings.size() ? matchings.get(idx) : null);
         }
 
-        MatchingEntries transform(UnaryOperator<Matching> fn) {
+        MatchingEntries transform(UnaryOperator<Matching> mapping) {
             MatchingEntries newEntries = new MatchingEntries();
-            matchings.stream()
-                .map(fn)
-                .filter(Objects::nonNull)
+            matchings.stream().map(mapping).filter(Objects::nonNull)
                 .forEach(newEntries::add);
             return newEntries;
         }
 
         MatchingEntries getLeft(int len) {
-            return transform(matching -> 0 <= len && len < matching.getTo() ? new Matching(matching.getFrom(), matching.getFrom() + len) : null);
+            return transform(matching -> {
+                int to = matching.getFrom() + len;
+                return matching.getFrom() <= to ? new Matching(matching.getFrom(), to) : null;
+            });
         }
 
         MatchingEntries getRight(int len) {
-            return transform(matching -> matching.getFrom() + len <= matching.getTo() ? new Matching(matching.getFrom() + len, matching.getTo()) : null);
+            return transform(matching -> {
+                int from = matching.getFrom() + len;
+                return 0 <= from && from <= matching.getTo() ? new Matching(from, matching.getTo()) : null;
+            });
         }
     }
 
@@ -138,11 +142,10 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
         return this;
     }
 
-    // TODO: rename to transform
-    MatchingResultSet<T> filter(BiFunction<? super T, MatchingEntries, Optional<MatchingEntries>> filter) {
+    MatchingResultSet<T> transform(BiFunction<? super T, MatchingEntries, Optional<MatchingEntries>> mapping) {
         MatchingResultSet<T> result = new MatchingResultSet<>();
         resultSet.forEach((word, entries) -> {
-            filter.apply(word, entries).ifPresent((value) -> {
+            mapping.apply(word, entries).ifPresent((value) -> {
                 result.resultSet.put(word, value);
             });
         });
@@ -168,14 +171,14 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     }
 
     MatchingResultSet<T> getLeft(int len) {
-        return filter((word, entries) -> {
+        return transform((word, entries) -> {
             MatchingEntries entriesLeft = entries.getLeft(len);
             return ofNullable(entriesLeft.matchings.isEmpty() ? null : entriesLeft);
         });
     }
 
     MatchingResultSet<T> getRight(int len) {
-        return filter((word, entries) -> {
+        return transform((word, entries) -> {
             MatchingEntries entriesRight = entries.getRight(len);
             return ofNullable(entriesRight.matchings.isEmpty() ? null : entriesRight);
         });
