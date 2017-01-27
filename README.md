@@ -13,7 +13,7 @@ Available patterns are:
 ##Usage Example
 
 ```java
-// load from a stream of words
+// load from the stream of words
 PatternMatcher<String> matcher = new PatternMatcher<>(
     Stream.of("AxB", "AyyBcC", "AzzzBdCD", "BCD")
 );
