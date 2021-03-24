@@ -1,6 +1,6 @@
 package lva.patternmatcher;
 
-import java.util.stream.Stream;
+import java.util.Collection;
 
 /**
  * Provides AST-based pattern matcher.
@@ -13,9 +13,9 @@ public class PatternMatcher <T extends CharSequence & Comparable<? super T>> {
 
     /**
      * Constructs matcher from stream of words to be searched.
-     * @param words - stream of words
+     * @param words - collection of words
      */
-    public PatternMatcher(Stream<T> words) {
+    public PatternMatcher(Collection<T> words) {
         this(new PatternCommandTokenizerImpl(), new SuffixTree<>(words));
     }
 

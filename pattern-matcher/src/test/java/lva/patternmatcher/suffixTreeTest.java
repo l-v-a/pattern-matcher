@@ -2,7 +2,8 @@ package lva.patternmatcher;
 
 import org.junit.Test;
 
-import java.util.stream.Stream;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -15,7 +16,7 @@ public class suffixTreeTest {
 
     @Test
     public void should_find_all_matches_of_substring() {
-        SuffixTree<String> ast = new SuffixTree<>(Stream.of("abababa"));
+        SuffixTree<String> ast = new SuffixTree<>(List.of("abababa"));
         MatchingResultSet<String> res = ast.search("aba");
 
         MatchingResultSet<String> expected = new MatchingResultSet<String>()
@@ -28,7 +29,7 @@ public class suffixTreeTest {
 
     @Test
     public void should_find_all_matches_of_substring_for_splitted_nodes() {
-        SuffixTree<String> ast = new SuffixTree<>(Stream.of("aaab"));
+        SuffixTree<String> ast = new SuffixTree<>(List.of("aaab"));
         MatchingResultSet<String> res = ast.search("aa");
 
         MatchingResultSet<String> expected = new MatchingResultSet<String>()
@@ -40,7 +41,7 @@ public class suffixTreeTest {
 
     @Test
     public void should_find_all_matches_of_substring_for_all_inputs() {
-        SuffixTree<String> ast = new SuffixTree<>(Stream.of("ab", "ac"));
+        SuffixTree<String> ast = new SuffixTree<>(List.of("ab", "ac"));
         MatchingResultSet<String> res = ast.search("a");
 
         MatchingResultSet<String> expected = new MatchingResultSet<String>()
@@ -52,7 +53,7 @@ public class suffixTreeTest {
 
     @Test
     public void should_find_all_words_for_empty_pattern() {
-        SuffixTree<String> ast = new SuffixTree<>(Stream.of("ab", "ac"));
+        SuffixTree<String> ast = new SuffixTree<>(List.of("ab", "ac"));
         MatchingResultSet<String> res = ast.search("");
 
         MatchingResultSet<String> expected = new MatchingResultSet<String>()
@@ -64,7 +65,7 @@ public class suffixTreeTest {
 
     @Test
     public void should_index_equals_word() {
-        SuffixTree<String> ast = new SuffixTree<>(Stream.of("ab", "ab"));
+        SuffixTree<String> ast = new SuffixTree<>(List.of("ab", "ab"));
         MatchingResultSet<String> res = ast.search("a");
 
         MatchingResultSet<String> expected = new MatchingResultSet<String>()
@@ -75,7 +76,7 @@ public class suffixTreeTest {
 
     @Test
     public void should_find_any_matches_of_substring_for_all_inputs() {
-        SuffixTree<String> ast = new SuffixTree<>(Stream.of("ab", "ac"));
+        SuffixTree<String> ast = new SuffixTree<>(List.of("ab", "ac"));
 
         assertEquals(resultSetOf("ab", 1, 2), ast.search("b"));
         assertEquals(resultSetOf("ac", 1, 2), ast.search("c"));
@@ -84,7 +85,7 @@ public class suffixTreeTest {
 
     @Test
     public void should_find_all_substrings_non_overlapped() {
-        SuffixTree<String> ast = new SuffixTree<>(Stream.of("abc"));
+        SuffixTree<String> ast = new SuffixTree<>(List.of("abc"));
 
         assertEquals(resultSetOf("abc", 0, 3), ast.search("abc"));
         assertEquals(resultSetOf("abc", 0, 2), ast.search("ab"));
@@ -96,7 +97,7 @@ public class suffixTreeTest {
 
     @Test
     public void should_find_all_substrings_overlapped() {
-        SuffixTree<String> ast = new SuffixTree<>(Stream.of("aaa"));
+        SuffixTree<String> ast = new SuffixTree<>(List.of("aaa"));
 
         MatchingResultSet<String> expected = new MatchingResultSet<String>()
             .add("aaa", 0, 3);
@@ -117,19 +118,19 @@ public class suffixTreeTest {
 
     @Test
     public void should_return_empty_result_for_unknown_substring() {
-        SuffixTree<String> ast = new SuffixTree<>(Stream.of("abc"));
+        SuffixTree<String> ast = new SuffixTree<>(List.of("abc"));
         assertTrue(ast.search("ac").getResultSet().isEmpty());
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void should_return_unmodifiable_result() {
-        SuffixTree<String> ast = new SuffixTree<>(Stream.of("abc"));
+        SuffixTree<String> ast = new SuffixTree<>(List.of("abc"));
         ast.search("d").add("a", 0, 1);
     }
 
     @Test
     public void should_skip_null_words() {
-        new SuffixTree<>(Stream.of("abc", null));
+        new SuffixTree<>(Arrays.asList("abc", null));
     }
 
     private static MatchingResultSet<String> resultSetOf(String word, int from, int to) {

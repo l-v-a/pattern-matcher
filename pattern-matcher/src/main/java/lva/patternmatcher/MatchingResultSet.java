@@ -5,7 +5,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 
@@ -145,7 +151,7 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     MatchingResultSet<T> transform(BiFunction<? super T, MatchingEntries, Optional<MatchingEntries>> mapping) {
         MatchingResultSet<T> result = new MatchingResultSet<>();
         resultSet.forEach((word, entries) -> {
-            mapping.apply(word, entries).ifPresent((value) -> {
+            mapping.apply(word, entries).ifPresent(value -> {
                 result.resultSet.put(word, value);
             });
         });
@@ -161,8 +167,8 @@ public class MatchingResultSet<T extends CharSequence & Comparable<? super T>> {
     MatchingResultSet<T> combine(MatchingResultSet<T> other, CombineFunction<? super T> combineFunction) {
         MatchingResultSet<T> result = new MatchingResultSet<>();
         resultSet.forEach((word, entries) -> {
-            ofNullable(other.resultSet.get(word)).ifPresent((entriesOther) -> {
-                combineFunction.apply(word, entries, entriesOther).ifPresent((combinedEntries) -> {
+            ofNullable(other.resultSet.get(word)).ifPresent(entriesOther -> {
+                combineFunction.apply(word, entries, entriesOther).ifPresent(combinedEntries -> {
                     result.resultSet.put(word, combinedEntries);
                 });
             });

@@ -3,8 +3,6 @@ package lva.patternmatcher;
 import lombok.NonNull;
 import lva.patternmatcher.Scanner.Lexeme;
 
-import java.util.Objects;
-
 /**
  * FSM-based pattern tokenizer implementation.
  *
@@ -29,28 +27,28 @@ class PatternCommandTokenizerImpl implements PatternCommandTokenizer {
         this.fsm = new FiniteStateMachine.Builder<State, Lexeme.Type>()
             .setInitialState(State.INITIAL)
             .setFinishedState(State.FINISHED)
-            .addTransition(State.INITIAL, State.BEGIN, Lexeme.Type.LITERAL, ((from, to, event) -> {
+            .addTransition(State.INITIAL, State.BEGIN, Lexeme.Type.LITERAL, (from, to, event) -> {
                 currentCommand = new BeginPatternCommand(currentLexeme.getValue());
-            }))
+            })
             .addTransition(State.INITIAL, State.BEGIN_ANY, Lexeme.Type.CONCATENATION)
             .addTransition(State.BEGIN, State.EXP_ANY, Lexeme.Type.CONCATENATION)
             .addTransition(State.BEGIN, State.EXP_STRICT, Lexeme.Type.STRICT_CONCATENATION)
-            .addTransition(State.BEGIN_ANY, State.BEGIN, Lexeme.Type.LITERAL, ((from, to, event) -> {
+            .addTransition(State.BEGIN_ANY, State.BEGIN, Lexeme.Type.LITERAL, (from, to, event) -> {
                 currentCommand = new BeginAnyPatternCommand(currentLexeme.getValue());
-            }))
+            })
             .addTransition(State.BEGIN_ANY, State.BEGIN_ANY, Lexeme.Type.CONCATENATION)
             .addTransition(State.EXP_ANY, State.EXP_ANY, Lexeme.Type.CONCATENATION)
-            .addTransition(State.EXP_ANY, State.BEGIN, Lexeme.Type.LITERAL, ((from, to, event) -> {
+            .addTransition(State.EXP_ANY, State.BEGIN, Lexeme.Type.LITERAL, (from, to, event) -> {
                 currentCommand = new ExpressionAnyPatternCommand(currentLexeme.getValue());
-            }))
-            .addTransition(State.EXP_STRICT, State.BEGIN, Lexeme.Type.LITERAL, ((from, to, event) -> {
+            })
+            .addTransition(State.EXP_STRICT, State.BEGIN, Lexeme.Type.LITERAL, (from, to, event) -> {
                 currentCommand = new ExpressionStrictPatternCommand(currentLexeme.getValue());
-            }))
+            })
             .addTransition(State.INITIAL, State.FINISHED, Lexeme.Type.NULL)
             .addTransition(State.BEGIN, State.FINISHED, Lexeme.Type.NULL)
-            .addTransition(State.BEGIN_ANY, State.FINISHED, Lexeme.Type.NULL, ((from, to, event) -> {
+            .addTransition(State.BEGIN_ANY, State.FINISHED, Lexeme.Type.NULL, (from, to, event) -> {
                 currentCommand = new BeginAnyPatternCommand("");
-            }))
+            })
             .addTransition(State.EXP_ANY, State.FINISHED, Lexeme.Type.NULL)
             .addTransition(State.EXP_STRICT, State.FINISHED, Lexeme.Type.NULL)
             .build();

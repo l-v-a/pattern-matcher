@@ -4,7 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
 import java.util.LinkedList;
-import java.util.Objects;
 import java.util.Queue;
 
 /**
@@ -91,74 +90,74 @@ class Scanner {
         this.fsm = new FiniteStateMachine.Builder<State, CharClass>()
             .setInitialState(State.INITIAL)
             .setFinishedState(State.FINISHED)
-            .addTransition(State.INITIAL, State.CAPITAL_SYMBOL, CharClass.CAPITAL_SYMBOL, ((from, to, event) -> {
+            .addTransition(State.INITIAL, State.CAPITAL_SYMBOL, CharClass.CAPITAL_SYMBOL, (from, to, event) -> {
                 beginOfLexemeIndex = currentCharIndex;
                 currentCharIndex++;
-            }))
-            .addTransition(State.INITIAL, State.SYMBOL, CharClass.SYMBOL, ((from, to, event) -> {
+            })
+            .addTransition(State.INITIAL, State.SYMBOL, CharClass.SYMBOL, (from, to, event) -> {
                 beginOfLexemeIndex = currentCharIndex;
                 currentCharIndex++;
-            }))
-            .addTransition(State.INITIAL, State.ASTERISK, CharClass.ASTERISK, ((from, to, event) -> {
+            })
+            .addTransition(State.INITIAL, State.ASTERISK, CharClass.ASTERISK, (from, to, event) -> {
                 beginOfLexemeIndex = currentCharIndex;
                 currentCharIndex++;
-            }))
-            .addTransition(State.INITIAL, State.FINISHED, CharClass.EOF, ((from, to, event) -> {
+            })
+            .addTransition(State.INITIAL, State.FINISHED, CharClass.EOF, (from, to, event) -> {
                 beginOfLexemeIndex = currentCharIndex;
                 currentCharIndex++;
-            }))
-            .addTransition(State.ASTERISK, State.CAPITAL_SYMBOL, CharClass.CAPITAL_SYMBOL, ((from, to, event) -> {
+            })
+            .addTransition(State.ASTERISK, State.CAPITAL_SYMBOL, CharClass.CAPITAL_SYMBOL, (from, to, event) -> {
                 currentLexemes.add(Lexeme.concatenation());
                 beginOfLexemeIndex = currentCharIndex;
                 currentCharIndex++;
-            }))
-            .addTransition(State.ASTERISK, State.SYMBOL, CharClass.SYMBOL, ((from, to, event) -> {
+            })
+            .addTransition(State.ASTERISK, State.SYMBOL, CharClass.SYMBOL, (from, to, event) -> {
                 currentLexemes.add(Lexeme.concatenation());
                 beginOfLexemeIndex = currentCharIndex;
                 currentCharIndex++;
-            }))
-            .addTransition(State.ASTERISK, State.ASTERISK, CharClass.ASTERISK, ((from, to, event) -> {
+            })
+            .addTransition(State.ASTERISK, State.ASTERISK, CharClass.ASTERISK, (from, to, event) -> {
                 currentLexemes.add(Lexeme.concatenation());
                 beginOfLexemeIndex = currentCharIndex;
                 currentCharIndex++;
-            }))
-            .addTransition(State.ASTERISK, State.FINISHED, CharClass.EOF, ((from, to, event) -> {
+            })
+            .addTransition(State.ASTERISK, State.FINISHED, CharClass.EOF, (from, to, event) -> {
                 currentLexemes.add(Lexeme.concatenation());
                 beginOfLexemeIndex = currentCharIndex;
-            }))
-            .addTransition(State.SYMBOL, State.CAPITAL_SYMBOL, CharClass.CAPITAL_SYMBOL, ((from, to, event) -> {
+            })
+            .addTransition(State.SYMBOL, State.CAPITAL_SYMBOL, CharClass.CAPITAL_SYMBOL, (from, to, event) -> {
                 currentCharIndex++;
-            }))
-            .addTransition(State.SYMBOL, State.SYMBOL, CharClass.SYMBOL, ((from, to, event) -> {
+            })
+            .addTransition(State.SYMBOL, State.SYMBOL, CharClass.SYMBOL, (from, to, event) -> {
                 currentCharIndex++;
-            }))
-            .addTransition(State.SYMBOL, State.ASTERISK, CharClass.ASTERISK, ((from, to, event) -> {
+            })
+            .addTransition(State.SYMBOL, State.ASTERISK, CharClass.ASTERISK, (from, to, event) -> {
                 currentLexemes.add(Lexeme.literal(sequence.subSequence(beginOfLexemeIndex, currentCharIndex)));
                 beginOfLexemeIndex = currentCharIndex;
                 currentCharIndex++;
-            }))
-            .addTransition(State.SYMBOL, State.FINISHED, CharClass.EOF, ((from, to, event) -> {
+            })
+            .addTransition(State.SYMBOL, State.FINISHED, CharClass.EOF, (from, to, event) -> {
                 currentLexemes.add(Lexeme.literal(sequence.subSequence(beginOfLexemeIndex, currentCharIndex)));
                 beginOfLexemeIndex = currentCharIndex;
-            }))
-            .addTransition(State.CAPITAL_SYMBOL, State.CAPITAL_SYMBOL, CharClass.CAPITAL_SYMBOL, ((from, to, event) -> {
+            })
+            .addTransition(State.CAPITAL_SYMBOL, State.CAPITAL_SYMBOL, CharClass.CAPITAL_SYMBOL, (from, to, event) -> {
                 currentLexemes.add(Lexeme.literal(sequence.subSequence(beginOfLexemeIndex, currentCharIndex)));
                 currentLexemes.add(Lexeme.strictConcatenation());
                 beginOfLexemeIndex = currentCharIndex;
                 currentCharIndex++;
-            }))
-            .addTransition(State.CAPITAL_SYMBOL, State.CAPITAL_SYMBOL, CharClass.SYMBOL, ((from, to, event) -> {
+            })
+            .addTransition(State.CAPITAL_SYMBOL, State.CAPITAL_SYMBOL, CharClass.SYMBOL, (from, to, event) -> {
                 currentCharIndex++;
-            }))
-            .addTransition(State.CAPITAL_SYMBOL, State.ASTERISK, CharClass.ASTERISK, ((from, to, event) -> {
+            })
+            .addTransition(State.CAPITAL_SYMBOL, State.ASTERISK, CharClass.ASTERISK, (from, to, event) -> {
                 currentLexemes.add(Lexeme.literal(sequence.subSequence(beginOfLexemeIndex, currentCharIndex)));
                 beginOfLexemeIndex = currentCharIndex;
                 currentCharIndex++;
-            }))
-            .addTransition(State.CAPITAL_SYMBOL, State.FINISHED, CharClass.EOF, ((from, to, event) -> {
+            })
+            .addTransition(State.CAPITAL_SYMBOL, State.FINISHED, CharClass.EOF, (from, to, event) -> {
                 currentLexemes.add(Lexeme.literal(sequence.subSequence(beginOfLexemeIndex, currentCharIndex)));
                 beginOfLexemeIndex = currentCharIndex;
-            }))
+            })
             .build();
     }
 

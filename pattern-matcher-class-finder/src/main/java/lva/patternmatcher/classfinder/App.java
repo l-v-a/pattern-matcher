@@ -10,11 +10,12 @@ import org.fusesource.jansi.AnsiConsole;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static org.fusesource.jansi.Ansi.Attribute.INTENSITY_BOLD;
 import static org.fusesource.jansi.Ansi.Attribute.INTENSITY_BOLD_OFF;
 import static org.fusesource.jansi.Ansi.Color.DEFAULT;
@@ -29,8 +30,8 @@ import static org.fusesource.jansi.Ansi.ansi;
 public class App {
     public static void main(String... args) throws IOException {
         ClassPath classPath = ClassPath.from(App.class.getClassLoader());
-        Stream<ClassName> classNames = classPath.getTopLevelClasses().stream()
-            .map(ClassName::new);
+        Collection<ClassName> classNames = classPath.getTopLevelClasses().stream()
+            .map(ClassName::new).collect(toList());
 
         System.out.print("loading ... ");
         PatternMatcher<ClassName> matcher = new PatternMatcher<>(classNames);
@@ -66,7 +67,7 @@ public class App {
                     }
 
                     if (from < simpleName.length()) {
-                        print(simpleName.substring(from, simpleName.length()), WHITE, INTENSITY_BOLD);
+                        print(simpleName.substring(from), WHITE, INTENSITY_BOLD);
                     }
 
                     print(format(" (%s)%n", className.getPackageName()), WHITE, INTENSITY_BOLD_OFF);

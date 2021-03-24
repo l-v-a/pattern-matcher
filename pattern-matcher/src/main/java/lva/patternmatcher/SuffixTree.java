@@ -1,13 +1,11 @@
 package lva.patternmatcher;
 
 import lombok.NonNull;
-import lva.patternmatcher.MatchingResultSet.Matching;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * Represents annotated suffix tree (AST).
@@ -50,8 +48,8 @@ class SuffixTree<T extends CharSequence & Comparable<? super T>> implements Sear
      *
      * @param words - stream of words to be added
      */
-    SuffixTree(@NonNull Stream<T> words) {
-        words.filter(Objects::nonNull)
+    SuffixTree(@NonNull Collection<T> words) {
+        words.stream().filter(Objects::nonNull)
             .forEach(this::addWord);
     }
 

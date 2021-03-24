@@ -2,7 +2,7 @@ package lva.patternmatcher;
 
 import org.junit.Test;
 
-import java.util.stream.Stream;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class PatternMatcherTest {
     private final PatternMatcher<String> matcher = new PatternMatcher<>(
-        Stream.of("AbcDef", "AbcDefGhj", "xyzAbcDef")
+        List.of("AbcDef", "AbcDefGhj", "xyzAbcDef")
     );
 
     @Test
