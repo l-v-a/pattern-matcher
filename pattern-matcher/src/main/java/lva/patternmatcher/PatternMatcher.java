@@ -1,7 +1,5 @@
 package lva.patternmatcher;
 
-import java.util.Collection;
-
 /**
  * Provides AST-based pattern matcher.
  *
@@ -12,10 +10,10 @@ public class PatternMatcher <T extends CharSequence & Comparable<? super T>> {
     private final Searchable<T> searchable;
 
     /**
-     * Constructs matcher from stream of words to be searched.
+     * Constructs matcher from collection of words to be searched.
      * @param words - collection of words
      */
-    public PatternMatcher(Collection<T> words) {
+    public PatternMatcher(Iterable<T> words) {
         this(new PatternCommandTokenizerImpl(), new SuffixTree<>(words));
     }
 

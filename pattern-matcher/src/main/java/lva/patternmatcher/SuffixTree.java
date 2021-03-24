@@ -2,7 +2,6 @@ package lva.patternmatcher;
 
 import lombok.NonNull;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -44,13 +43,16 @@ class SuffixTree<T extends CharSequence & Comparable<? super T>> implements Sear
     private final Node<T> rootNode = new Node<>("");
 
     /**
-     * Constructs AST from stream of {@code words}.
+     * Constructs AST from collection of {@code words}.
      *
-     * @param words - stream of words to be added
+     * @param words - words to be added
      */
-    SuffixTree(@NonNull Collection<T> words) {
-        words.stream().filter(Objects::nonNull)
-            .forEach(this::addWord);
+    SuffixTree(@NonNull Iterable<T> words) {
+        words.forEach(word -> {
+            if (Objects.nonNull(word)) {
+                addWord(word);
+            }
+        });
     }
 
     private void addWord(@NonNull T word) {
