@@ -3,13 +3,10 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>lva.classfinder</groupId>
-    <artifactId>class-finder</artifactId>
+    <artifactId>pattern-matcher-class-finder</artifactId>
+    <name>pattern-matcher-class-finder</name>
     <version>1.0-SNAPSHOT</version>
-
     <packaging>jar</packaging>
-    <name>class-finder</name>
 
     <parent>
         <groupId>lva.patternmatcher</groupId>
@@ -55,7 +52,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>lva.classfinder.App</mainClass>
+                            <mainClass>lva.patternmatcher.classfinder.App</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

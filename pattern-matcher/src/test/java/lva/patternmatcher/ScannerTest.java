@@ -6,12 +6,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
-import static org.hamcrest.CoreMatchers.*;
-
 import static lva.patternmatcher.Scanner.Lexeme;
-import static lva.patternmatcher.Scanner.Lexeme.*;
+import static lva.patternmatcher.Scanner.Lexeme.concatenation;
+import static lva.patternmatcher.Scanner.Lexeme.literal;
+import static lva.patternmatcher.Scanner.Lexeme.strictConcatenation;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author vlitvinenko

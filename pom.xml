@@ -15,7 +15,7 @@
 
     <modules>
         <module>pattern-matcher</module>
-        <module>class-finder</module>
+        <module>pattern-matcher-class-finder</module>
     </modules>
 
     <dependencyManagement>
@@ -23,13 +23,13 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.12</version>
+                <version>4.13.1</version>
             </dependency>
 
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
-                <version>1.10.19</version>
+                <artifactId>mockito-core</artifactId>
+                <version>3.8.0</version>
             </dependency>
 
             <dependency>
@@ -53,7 +53,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>21.0</version>
+                <version>25.1-jre</version>
             </dependency>
 
             <dependency>

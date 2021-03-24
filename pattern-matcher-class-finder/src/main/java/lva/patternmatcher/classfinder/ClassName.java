@@ -1,4 +1,4 @@
-package lva.classfinder;
+package lva.patternmatcher.classfinder;
 
 import com.google.common.reflect.ClassPath;
 import lombok.Getter;

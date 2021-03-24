@@ -1,4 +1,4 @@
-package lva.classfinder;
+package lva.patternmatcher.classfinder;
 
 import com.google.common.reflect.ClassPath;
 import lva.patternmatcher.MatchingResultSet;
@@ -17,7 +17,9 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static org.fusesource.jansi.Ansi.Attribute.INTENSITY_BOLD;
 import static org.fusesource.jansi.Ansi.Attribute.INTENSITY_BOLD_OFF;
-import static org.fusesource.jansi.Ansi.Color.*;
+import static org.fusesource.jansi.Ansi.Color.DEFAULT;
+import static org.fusesource.jansi.Ansi.Color.RED;
+import static org.fusesource.jansi.Ansi.Color.WHITE;
 import static org.fusesource.jansi.Ansi.ansi;
 
 
@@ -25,7 +27,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * @author vlitvinenko
  */
 public class App {
-    public static void main(String ... args) throws IOException {
+    public static void main(String... args) throws IOException {
         ClassPath classPath = ClassPath.from(App.class.getClassLoader());
         Stream<ClassName> classNames = classPath.getTopLevelClasses().stream()
             .map(ClassName::new);
