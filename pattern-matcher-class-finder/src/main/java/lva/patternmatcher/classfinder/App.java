@@ -2,6 +2,7 @@ package lva.patternmatcher.classfinder;
 
 import com.google.common.reflect.ClassPath;
 import lva.patternmatcher.MatchingResultSet;
+import lva.patternmatcher.MatchingResultSet.Matching;
 import lva.patternmatcher.PatternMatcher;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.Ansi.Attribute;
@@ -10,8 +11,10 @@ import org.fusesource.jansi.AnsiConsole;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 import java.util.Scanner;
 
 import static java.lang.String.format;
@@ -28,6 +31,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * @author vlitvinenko
  */
 public class App {
+
     public static void main(String... args) throws IOException {
         ClassPath classPath = ClassPath.from(App.class.getClassLoader());
         Collection<ClassName> classNames = classPath.getTopLevelClasses().stream()
@@ -37,11 +41,9 @@ public class App {
         PatternMatcher<ClassName> matcher = new PatternMatcher<>(classNames);
         System.out.println("done");
 
-        Scanner scanner = new Scanner(System.in);
-
         AnsiConsole.systemInstall();
 
-        try {
+        try (Scanner scanner = new Scanner(System.in)) {
 
             while (true) {
                 print("> ", DEFAULT, INTENSITY_BOLD);
@@ -53,21 +55,17 @@ public class App {
                 Duration searchDuration = Duration.between(start, Instant.now());
                 print(format("done%n"), DEFAULT, INTENSITY_BOLD);
 
-                Map<ClassName, MatchingResultSet.MatchingEntries> resultSet = res.getResultSet();
+                var resultSet = res.getResultSet();
 
                 resultSet.forEach((className, entries) -> {
-                    String simpleName = className.getSimpleName();
-                    int from = 0;
+                    var simpleName = className.getSimpleName();
+                    var fullMatching = new Matching(0, simpleName.length());
+                    var matchingIntervals = split(fullMatching, entries.getMatchings());
 
-                    for (MatchingResultSet.Matching m : entries.getMatchings()) {
-                        print(simpleName.substring(from, m.getFrom()), WHITE, INTENSITY_BOLD);
-
-                        from = Math.min(m.getTo(), simpleName.length());
-                        print(simpleName.substring(m.getFrom(), from), RED, INTENSITY_BOLD);
-                    }
-
-                    if (from < simpleName.length()) {
-                        print(simpleName.substring(from), WHITE, INTENSITY_BOLD);
+                    for (int i = 0; i < matchingIntervals.size(); i++) {
+                        var interval = matchingIntervals.get(i);
+                        print(simpleName.substring(interval.getFrom(), interval.getTo()),
+                                i % 2 == 0 ? WHITE : RED, INTENSITY_BOLD);
                     }
 
                     print(format(" (%s)%n", className.getPackageName()), WHITE, INTENSITY_BOLD_OFF);
@@ -80,6 +78,23 @@ public class App {
         } finally {
             AnsiConsole.systemUninstall();
         }
+    }
+
+    private static List<Matching> split(Matching fullMatching, List<Matching> matchings) {
+        var matchingIntervals = new ArrayDeque<Matching>(matchings.size() * 2 + 1);
+        matchingIntervals.addLast(fullMatching);
+
+        for (var m : matchings) {
+            var last = matchingIntervals.getLast();
+            if (m.getTo() <= last.getTo()) {
+                matchingIntervals.removeLast();
+                matchingIntervals.addLast(new Matching(last.getFrom(), m.getFrom()));
+                matchingIntervals.addLast(new Matching(m.getFrom(), m.getTo()));
+                matchingIntervals.addLast(new Matching(m.getTo(), last.getTo()));
+            }
+        }
+
+        return new ArrayList<>(matchingIntervals);
     }
 
     private static void print(String msg, Ansi.Color fgColor, Attribute attribute) {
