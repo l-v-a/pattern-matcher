@@ -11,7 +11,6 @@ import org.fusesource.jansi.AnsiConsole;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -81,20 +80,20 @@ public class App {
     }
 
     private static List<Matching> split(Matching fullMatching, List<Matching> matchings) {
-        var matchingIntervals = new ArrayDeque<Matching>(matchings.size() * 2 + 1);
-        matchingIntervals.addLast(fullMatching);
+        var matchingIntervals = new ArrayList<Matching>(matchings.size() * 2 + 1);
+        matchingIntervals.add(fullMatching);
 
         for (var m : matchings) {
-            var last = matchingIntervals.getLast();
+            var last = matchingIntervals.get(matchingIntervals.size() - 1);
             if (m.getTo() <= last.getTo()) {
-                matchingIntervals.removeLast();
-                matchingIntervals.addLast(new Matching(last.getFrom(), m.getFrom()));
-                matchingIntervals.addLast(new Matching(m.getFrom(), m.getTo()));
-                matchingIntervals.addLast(new Matching(m.getTo(), last.getTo()));
+                matchingIntervals.remove(matchingIntervals.size() - 1);
+                matchingIntervals.add(new Matching(last.getFrom(), m.getFrom()));
+                matchingIntervals.add(new Matching(m.getFrom(), m.getTo()));
+                matchingIntervals.add(new Matching(m.getTo(), last.getTo()));
             }
         }
 
-        return new ArrayList<>(matchingIntervals);
+        return matchingIntervals;
     }
 
     private static void print(String msg, Ansi.Color fgColor, Attribute attribute) {
