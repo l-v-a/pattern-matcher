@@ -73,10 +73,10 @@ private fun Matching.split(matchings: List<Matching>): List<Matching> {
 }
 
 private operator fun Matching.contains(matching: Matching) =
-    to >= matching.to
+    this.to >= matching.to
 
 private fun Matching.splitByMatching(matching: Matching) = listOf(
-    Matching(from, matching.from), Matching(matching.from, matching.to), Matching(matching.to, to)
+    Matching(this.from, matching.from), Matching(matching.from, matching.to), Matching(matching.to, this.to)
 )
 
 private fun print(msg: String, fgColor: Ansi.Color = DEFAULT, attribute: Ansi.Attribute = INTENSITY_BOLD) {
