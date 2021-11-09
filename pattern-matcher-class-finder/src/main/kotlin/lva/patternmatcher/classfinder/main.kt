@@ -47,7 +47,7 @@ fun main() {
 
                 fullMatchings.forEachIndexed { i, matching ->
                     val matchedText = simpleName.substring(matching.from, matching.to)
-                    print(matchedText, FG_COLORS[i % 2])
+                    print(matchedText, FG_COLORS[i % FG_COLORS.size])
                 }
 
                 print(" (${className.packageName})\n", WHITE, INTENSITY_BOLD_OFF)
