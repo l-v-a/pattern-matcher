@@ -61,23 +61,25 @@ fun main() {
     }
 }
 
-private fun Matching.containsWithin(matching: Matching) =
-    to <= matching.to
-
 private fun Matching.split(matchings: List<Matching>): List<Matching> {
     val splitted = ArrayList<Matching>(matchings.size * 2 + 1).apply { add(this@split) }
 
-    for (m in matchings) {
-        splitted.last().takeIf { m.containsWithin(it) }?.let {
+    for (matching in matchings) {
+        splitted.last().takeIf { matching.containsWithin(it) }?.let {
             splitted -= it
-            splitted += Matching(it.from, m.from)
-            splitted += Matching(m.from, m.to)
-            splitted += Matching(m.to, it.to)
+            splitted += it.splitByMatching(matching)
         }
     }
 
     return splitted
 }
+
+private fun Matching.containsWithin(matching: Matching) =
+    to <= matching.to
+
+private fun Matching.splitByMatching(matching: Matching) = arrayOf(
+    Matching(from, matching.from), Matching(matching.from, matching.to), Matching(matching.to, to)
+)
 
 private fun print(msg: String, fgColor: Ansi.Color = DEFAULT, attribute: Ansi.Attribute = INTENSITY_BOLD) {
     AnsiConsole.out.print(Ansi.ansi().fg(fgColor).a(attribute).a(msg).reset())
