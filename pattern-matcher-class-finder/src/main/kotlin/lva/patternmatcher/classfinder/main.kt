@@ -61,14 +61,12 @@ fun main() {
 
 private fun Matching.split(matchings: List<Matching>): List<Matching> {
     val splitted = ArrayList<Matching>(matchings.size * 2 + 1).apply { add(this@split) }
-
-    for (matching in matchings) {
+    matchings.forEach { matching ->
         splitted.last().takeIf { matching in it }?.let {
             splitted -= it
             splitted += it.splitByMatching(matching)
         }
     }
-
     return splitted
 }
 
