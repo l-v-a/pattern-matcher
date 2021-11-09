@@ -19,21 +19,21 @@ import kotlin.time.measureTimedValue
 @ExperimentalTime
 fun main() {
     val classPath = ClassPath.from(ClassLoader.getSystemClassLoader())
-    val classNames: Collection<ClassName> = classPath.topLevelClasses.map { ClassName(it) }.toList()
+    val classNames = classPath.topLevelClasses.map { ClassName(it) }.toList()
 
     print("loading ... ")
     val matcher = PatternMatcher(classNames)
-    println("done")
+    print("done\n")
 
     AnsiConsole.systemInstall()
     try {
         while (true) {
-            print("> ", DEFAULT, INTENSITY_BOLD)
+            print("> ")
             val pattern = readLine()
 
-            print("searching for '$pattern' ... ", DEFAULT, INTENSITY_BOLD)
+            print("searching for '$pattern' ... ")
             val (res, searchDuration) = measureTimedValue { matcher.match(pattern) }
-            print("done\n", DEFAULT, INTENSITY_BOLD)
+            print("done\n")
 
             val resultSet = res.resultSet
 
@@ -43,15 +43,13 @@ fun main() {
                 val matchingIntervals = split(fullMatching, entries.matchings)
 
                 matchingIntervals.forEachIndexed { i, interval ->
-                    print(simpleName.substring(interval.from, interval.to),
-                        if (i % 2 == 0) WHITE else RED, INTENSITY_BOLD)
+                    print(simpleName.substring(interval.from, interval.to), if (i % 2 == 0) WHITE else RED)
                 }
 
                 print(" (${className.packageName})\n", WHITE, INTENSITY_BOLD_OFF)
             }
 
-            print("\nsearching time: ${searchDuration.inWholeMilliseconds} ms\nfound: ${resultSet.size}\n",
-                DEFAULT, INTENSITY_BOLD)
+            print("\nsearching time: ${searchDuration.inWholeMilliseconds} ms\nfound: ${resultSet.size}\n")
         }
     } finally {
         AnsiConsole.systemUninstall()
@@ -74,7 +72,7 @@ private fun split(fullMatching: Matching, matchings: List<Matching>): List<Match
     return matchingIntervals
 }
 
-private fun print(msg: String, fgColor: Ansi.Color, attribute: Ansi.Attribute) {
+private fun print(msg: String, fgColor: Ansi.Color = DEFAULT, attribute: Ansi.Attribute = INTENSITY_BOLD) {
     AnsiConsole.out.print(Ansi.ansi().fg(fgColor).a(attribute).a(msg).reset())
     AnsiConsole.out.flush()
 }
