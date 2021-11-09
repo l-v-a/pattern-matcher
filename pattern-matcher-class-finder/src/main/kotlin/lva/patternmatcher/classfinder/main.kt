@@ -53,8 +53,7 @@ fun main() {
                 print(" (${className.packageName})\n", WHITE, INTENSITY_BOLD_OFF)
             }
 
-            print("\nsearching time: ${searchDuration.inWholeMilliseconds} ms" +
-                    "\nfound: ${resultSet.size}\n")
+            print("\nfound ${resultSet.size} in ${searchDuration.inWholeMilliseconds} ms\n")
         }
     } finally {
         AnsiConsole.systemUninstall()
