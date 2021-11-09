@@ -17,11 +17,10 @@ import kotlin.time.measureTimedValue
 /**
  * @author vlitvinenko
  */
-
 private val FG_COLORS = arrayOf(WHITE, RED)
 
 @ExperimentalTime
-fun main() {
+fun main() = withAnsiConsole {
     val classPath = ClassPath.from(ClassLoader.getSystemClassLoader())
     val classNames = classPath.topLevelClasses.map { ClassName(it) }.toList()
 
@@ -29,33 +28,28 @@ fun main() {
     val matcher = PatternMatcher(classNames)
     print("done\n")
 
-    AnsiConsole.systemInstall()
-    try {
-        while (true) {
-            print("> ")
-            val pattern = readLine()
+    while (true) {
+        print("> ")
+        val pattern = readLine()
 
-            print("searching for '$pattern' ... ")
-            val (resultSet, searchDuration) = measureTimedValue { matcher.match(pattern).resultSet }
-            print("done\n")
+        print("searching for '$pattern' ... ")
+        val (resultSet, searchDuration) = measureTimedValue { matcher.match(pattern).resultSet }
+        print("done\n")
 
-            resultSet.forEach { (className, entries) ->
-                val simpleName = className.simpleName
-                val fullMatching = Matching(0, simpleName.length)
-                val fullMatchings = fullMatching.split(entries.matchings)
+        resultSet.forEach { (className, entries) ->
+            val simpleName = className.simpleName
+            val fullMatching = Matching(0, simpleName.length)
+            val fullMatchings = fullMatching.split(entries.matchings)
 
-                fullMatchings.forEachIndexed { i, matching ->
-                    val matchedText = simpleName.substring(matching.from, matching.to)
-                    print(matchedText, FG_COLORS[i % FG_COLORS.size])
-                }
-
-                print(" (${className.packageName})\n", WHITE, INTENSITY_BOLD_OFF)
+            fullMatchings.forEachIndexed { i, matching ->
+                val matchedText = simpleName.substring(matching.from, matching.to)
+                print(matchedText, FG_COLORS[i % FG_COLORS.size])
             }
 
-            print("\nfound ${resultSet.size} in ${searchDuration.inWholeMilliseconds} ms\n")
+            print(" (${className.packageName})\n", WHITE, INTENSITY_BOLD_OFF)
         }
-    } finally {
-        AnsiConsole.systemUninstall()
+
+        print("\nfound ${resultSet.size} in ${searchDuration.inWholeMilliseconds} ms\n")
     }
 }
 
@@ -76,6 +70,15 @@ private operator fun Matching.contains(matching: Matching) =
 private fun Matching.splitByMatching(matching: Matching) = listOf(
     Matching(this.from, matching.from), Matching(matching.from, matching.to), Matching(matching.to, this.to)
 )
+
+private inline fun withAnsiConsole(block: () -> Unit) {
+    AnsiConsole.systemInstall()
+    try {
+        block()
+    } finally {
+        AnsiConsole.systemUninstall()
+    }
+}
 
 private fun print(msg: String, fgColor: Ansi.Color = DEFAULT, attribute: Ansi.Attribute = INTENSITY_BOLD) {
     AnsiConsole.out.print(Ansi.ansi().fg(fgColor).a(attribute).a(msg).reset())
