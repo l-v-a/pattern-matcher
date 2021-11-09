@@ -61,16 +61,18 @@ fun main() {
     }
 }
 
+private fun Matching.containsWithin(matching: Matching) =
+    to <= matching.to
+
 private fun Matching.split(matchings: List<Matching>): List<Matching> {
     val splitted = ArrayList<Matching>(matchings.size * 2 + 1).apply { add(this@split) }
 
     for (m in matchings) {
-        val last = splitted.last()
-        if (m.to <= last.to) {
-            splitted -= last
-            splitted += Matching(last.from, m.from)
+        splitted.last().takeIf { m.containsWithin(it) }?.let {
+            splitted -= it
+            splitted += Matching(it.from, m.from)
             splitted += Matching(m.from, m.to)
-            splitted += Matching(m.to, last.to)
+            splitted += Matching(m.to, it.to)
         }
     }
 
