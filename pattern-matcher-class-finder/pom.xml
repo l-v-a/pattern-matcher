@@ -18,9 +18,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
         </dependency>
 
         <dependency>
@@ -52,7 +51,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>lva.patternmatcher.classfinder.App</mainClass>
+                            <mainClass>lva.patternmatcher.classfinder.MainKt</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

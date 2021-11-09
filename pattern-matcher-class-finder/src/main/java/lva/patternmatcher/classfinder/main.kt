@@ -1,103 +1,92 @@
-package lva.patternmatcher.classfinder;
+package lva.patternmatcher.classfinder
 
-import com.google.common.reflect.ClassPath;
-import lva.patternmatcher.MatchingResultSet;
-import lva.patternmatcher.MatchingResultSet.Matching;
-import lva.patternmatcher.PatternMatcher;
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.Ansi.Attribute;
-import org.fusesource.jansi.AnsiConsole;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Scanner;
-
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-import static org.fusesource.jansi.Ansi.Attribute.INTENSITY_BOLD;
-import static org.fusesource.jansi.Ansi.Attribute.INTENSITY_BOLD_OFF;
-import static org.fusesource.jansi.Ansi.Color.DEFAULT;
-import static org.fusesource.jansi.Ansi.Color.RED;
-import static org.fusesource.jansi.Ansi.Color.WHITE;
-import static org.fusesource.jansi.Ansi.ansi;
-
+import com.google.common.reflect.ClassPath
+import lva.patternmatcher.MatchingResultSet.Matching
+import lva.patternmatcher.PatternMatcher
+import org.fusesource.jansi.Ansi
+import org.fusesource.jansi.Ansi.Attribute.INTENSITY_BOLD
+import org.fusesource.jansi.Ansi.Attribute.INTENSITY_BOLD_OFF
+import org.fusesource.jansi.Ansi.Color.DEFAULT
+import org.fusesource.jansi.Ansi.Color.RED
+import org.fusesource.jansi.Ansi.Color.WHITE
+import org.fusesource.jansi.AnsiConsole
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 /**
  * @author vlitvinenko
  */
-public class App {
+@ExperimentalTime
+fun main() {
+    val classPath = ClassPath.from(ClassLoader.getSystemClassLoader())
+    val classNames: Collection<ClassName> = classPath.topLevelClasses.map { ClassName(it) }.toList()
 
-    public static void main(String... args) throws IOException {
-        ClassPath classPath = ClassPath.from(App.class.getClassLoader());
-        Collection<ClassName> classNames = classPath.getTopLevelClasses().stream()
-            .map(ClassName::new).collect(toList());
+    print("loading ... ")
+    val matcher = PatternMatcher(classNames)
+    println("done")
 
-        System.out.print("loading ... ");
-        PatternMatcher<ClassName> matcher = new PatternMatcher<>(classNames);
-        System.out.println("done");
+    AnsiConsole.systemInstall()
+    try {
+        while (true) {
+            print("> ", DEFAULT, INTENSITY_BOLD)
+            val pattern = readLine()
 
-        AnsiConsole.systemInstall();
+            print("searching for '$pattern' ... ", DEFAULT, INTENSITY_BOLD)
+            val (res, searchDuration) = measureTimedValue { matcher.match(pattern) }
+            print("done\n", DEFAULT, INTENSITY_BOLD)
 
-        try (Scanner scanner = new Scanner(System.in)) {
+            val resultSet = res.resultSet
 
-            while (true) {
-                print("> ", DEFAULT, INTENSITY_BOLD);
-                String pattern = scanner.nextLine();
+            resultSet.forEach { (className, entries) ->
+                val simpleName = className.simpleName
+                val fullMatching = Matching(0, simpleName.length)
+                val matchingIntervals = split(fullMatching, entries.matchings)
 
-                print(format("searching for '%s' ... ", pattern), DEFAULT, INTENSITY_BOLD);
-                Instant start = Instant.now();
-                MatchingResultSet<ClassName> res = matcher.match(pattern);
-                Duration searchDuration = Duration.between(start, Instant.now());
-                print(format("done%n"), DEFAULT, INTENSITY_BOLD);
+                matchingIntervals.forEachIndexed { i, interval ->
+                    print(simpleName.substring(interval.from, interval.to),
+                        if (i % 2 == 0) WHITE else RED, INTENSITY_BOLD)
+                }
 
-                var resultSet = res.getResultSet();
-
-                resultSet.forEach((className, entries) -> {
-                    var simpleName = className.getSimpleName();
-                    var fullMatching = new Matching(0, simpleName.length());
-                    var matchingIntervals = split(fullMatching, entries.getMatchings());
-
-                    for (int i = 0; i < matchingIntervals.size(); i++) {
-                        var interval = matchingIntervals.get(i);
-                        print(simpleName.substring(interval.getFrom(), interval.getTo()),
-                                i % 2 == 0 ? WHITE : RED, INTENSITY_BOLD);
-                    }
-
-                    print(format(" (%s)%n", className.getPackageName()), WHITE, INTENSITY_BOLD_OFF);
-                });
-
-                print(format("%nsearching time: %d ms%nfound: %d%n",
-                    searchDuration.toMillis(), resultSet.size()), DEFAULT, INTENSITY_BOLD);
-
+                print(" (${className.packageName})\n", WHITE, INTENSITY_BOLD_OFF)
             }
-        } finally {
-            AnsiConsole.systemUninstall();
+
+            print("\nsearching time: ${searchDuration.inWholeMilliseconds} ms\nfound: ${resultSet.size}\n",
+                DEFAULT, INTENSITY_BOLD)
+        }
+    } finally {
+        AnsiConsole.systemUninstall()
+    }
+}
+
+private fun split(fullMatching: Matching, matchings: List<Matching>): List<Matching> {
+    val matchingIntervals = ArrayList<Matching>(matchings.size * 2 + 1).apply { add(fullMatching) }
+
+    for (m in matchings) {
+        val last = matchingIntervals.last()
+        if (m.to <= last.to) {
+            matchingIntervals -= last
+            matchingIntervals += Matching(last.from, m.from)
+            matchingIntervals += Matching(m.from, m.to)
+            matchingIntervals += Matching(m.to, last.to)
         }
     }
 
-    private static List<Matching> split(Matching fullMatching, List<Matching> matchings) {
-        var matchingIntervals = new ArrayList<Matching>(matchings.size() * 2 + 1);
-        matchingIntervals.add(fullMatching);
+    return matchingIntervals
+}
 
-        for (var m : matchings) {
-            var last = matchingIntervals.get(matchingIntervals.size() - 1);
-            if (m.getTo() <= last.getTo()) {
-                matchingIntervals.remove(matchingIntervals.size() - 1);
-                matchingIntervals.add(new Matching(last.getFrom(), m.getFrom()));
-                matchingIntervals.add(new Matching(m.getFrom(), m.getTo()));
-                matchingIntervals.add(new Matching(m.getTo(), last.getTo()));
-            }
-        }
+private fun print(msg: String, fgColor: Ansi.Color, attribute: Ansi.Attribute) {
+    AnsiConsole.out.print(Ansi.ansi().fg(fgColor).a(attribute).a(msg).reset())
+    AnsiConsole.out.flush()
+}
 
-        return matchingIntervals;
-    }
+private class ClassName(private val classInfo: ClassPath.ClassInfo) :
+    CharSequence by classInfo.simpleName,
+    Comparable<ClassName> {
 
-    private static void print(String msg, Ansi.Color fgColor, Attribute attribute) {
-        AnsiConsole.out.print(ansi().fg(fgColor).a(attribute).a(msg).reset());
-        AnsiConsole.out.flush();
-    }
+    val simpleName: String by classInfo::simpleName
+    val packageName: String by classInfo::packageName
+    private val fullName = simpleName + packageName
+
+    override operator fun compareTo(other: ClassName) =
+        fullName.compareTo(other.fullName)
 }
