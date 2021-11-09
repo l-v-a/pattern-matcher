@@ -58,7 +58,7 @@ class SuffixTree<T extends CharSequence & Comparable<? super T>> implements Sear
     private void addWord(@NonNull T word) {
         // add suffixes
         CharSequence suffix = new StringBuilder(word) // to avoid Object.toString() calling
-            .append(TERMINAL_SYMBOL).toString();
+            .append(TERMINAL_SYMBOL);
 
         for (int i = 0; i < suffix.length(); i++) {
 
