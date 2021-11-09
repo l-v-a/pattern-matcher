@@ -40,10 +40,10 @@ fun main() {
             resultSet.forEach { (className, entries) ->
                 val simpleName = className.simpleName
                 val fullMatching = Matching(0, simpleName.length)
-                val matchingIntervals = split(fullMatching, entries.matchings)
+                val fullMatchings = fullMatching.split(entries.matchings)
 
-                matchingIntervals.forEachIndexed { i, interval ->
-                    print(simpleName.substring(interval.from, interval.to), if (i % 2 == 0) WHITE else RED)
+                fullMatchings.forEachIndexed { i, matching ->
+                    print(simpleName.substring(matching.from, matching.to), if (i % 2 == 0) WHITE else RED)
                 }
 
                 print(" (${className.packageName})\n", WHITE, INTENSITY_BOLD_OFF)
@@ -56,20 +56,20 @@ fun main() {
     }
 }
 
-private fun split(fullMatching: Matching, matchings: List<Matching>): List<Matching> {
-    val matchingIntervals = ArrayList<Matching>(matchings.size * 2 + 1).apply { add(fullMatching) }
+private fun Matching.split(matchings: List<Matching>): List<Matching> {
+    val splitted = ArrayList<Matching>(matchings.size * 2 + 1).apply { add(this@split) }
 
     for (m in matchings) {
-        val last = matchingIntervals.last()
+        val last = splitted.last()
         if (m.to <= last.to) {
-            matchingIntervals -= last
-            matchingIntervals += Matching(last.from, m.from)
-            matchingIntervals += Matching(m.from, m.to)
-            matchingIntervals += Matching(m.to, last.to)
+            splitted -= last
+            splitted += Matching(last.from, m.from)
+            splitted += Matching(m.from, m.to)
+            splitted += Matching(m.to, last.to)
         }
     }
 
-    return matchingIntervals
+    return splitted
 }
 
 private fun print(msg: String, fgColor: Ansi.Color = DEFAULT, attribute: Ansi.Attribute = INTENSITY_BOLD) {
