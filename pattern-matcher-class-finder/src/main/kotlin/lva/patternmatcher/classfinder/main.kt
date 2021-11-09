@@ -54,6 +54,20 @@ fun main() = withAnsiConsole {
     }
 }
 
+private inline fun withAnsiConsole(block: () -> Unit) {
+    AnsiConsole.systemInstall()
+    try {
+        block()
+    } finally {
+        AnsiConsole.systemUninstall()
+    }
+}
+
+private fun print(msg: String, fgColor: Ansi.Color = DEFAULT, attribute: Ansi.Attribute = INTENSITY_BOLD) {
+    AnsiConsole.out.print(Ansi.ansi().fg(fgColor).a(attribute).a(msg).reset())
+    AnsiConsole.out.flush()
+}
+
 private fun Matching.split(matchings: List<Matching>): List<Matching> {
     val splitted = ArrayList<Matching>(matchings.size * 2 + 1).apply { add(this@split) }
     matchings.forEach { matching ->
@@ -71,20 +85,6 @@ private operator fun Matching.contains(matching: Matching) =
 private fun Matching.splitByMatching(matching: Matching) = listOf(
     Matching(this.from, matching.from), Matching(matching.from, matching.to), Matching(matching.to, this.to)
 )
-
-private inline fun withAnsiConsole(block: () -> Unit) {
-    AnsiConsole.systemInstall()
-    try {
-        block()
-    } finally {
-        AnsiConsole.systemUninstall()
-    }
-}
-
-private fun print(msg: String, fgColor: Ansi.Color = DEFAULT, attribute: Ansi.Attribute = INTENSITY_BOLD) {
-    AnsiConsole.out.print(Ansi.ansi().fg(fgColor).a(attribute).a(msg).reset())
-    AnsiConsole.out.flush()
-}
 
 private class ClassName(private val classInfo: ClassInfo) : Comparable<ClassName>, CharSequence by classInfo.simpleName {
     val simpleName: String by classInfo::simpleName
