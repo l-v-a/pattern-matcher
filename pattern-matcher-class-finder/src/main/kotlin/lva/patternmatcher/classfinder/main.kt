@@ -36,10 +36,8 @@ fun main() {
             val pattern = readLine()
 
             print("searching for '$pattern' ... ")
-            val (res, searchDuration) = measureTimedValue { matcher.match(pattern) }
+            val (resultSet, searchDuration) = measureTimedValue { matcher.match(pattern).resultSet }
             print("done\n")
-
-            val resultSet = res.resultSet
 
             resultSet.forEach { (className, entries) ->
                 val simpleName = className.simpleName
