@@ -86,10 +86,7 @@ private fun print(msg: String, fgColor: Ansi.Color = DEFAULT, attribute: Ansi.At
     AnsiConsole.out.flush()
 }
 
-private class ClassName(private val classInfo: ClassInfo) :
-    CharSequence by classInfo.simpleName,
-    Comparable<ClassName> {
-
+private class ClassName(private val classInfo: ClassInfo) : Comparable<ClassName>, CharSequence by classInfo.simpleName {
     val simpleName: String by classInfo::simpleName
     val packageName: String by classInfo::packageName
     private val fullName = simpleName + packageName
