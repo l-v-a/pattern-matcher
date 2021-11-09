@@ -16,6 +16,9 @@ import kotlin.time.measureTimedValue
 /**
  * @author vlitvinenko
  */
+
+private val FG_COLORS = arrayOf(WHITE, RED)
+
 @ExperimentalTime
 fun main() {
     val classPath = ClassPath.from(ClassLoader.getSystemClassLoader())
@@ -43,7 +46,8 @@ fun main() {
                 val fullMatchings = fullMatching.split(entries.matchings)
 
                 fullMatchings.forEachIndexed { i, matching ->
-                    print(simpleName.substring(matching.from, matching.to), if (i % 2 == 0) WHITE else RED)
+                    val matchedText = simpleName.substring(matching.from, matching.to)
+                    print(matchedText, FG_COLORS[i % 2])
                 }
 
                 print(" (${className.packageName})\n", WHITE, INTENSITY_BOLD_OFF)
