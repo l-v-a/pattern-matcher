@@ -1,6 +1,7 @@
 package lva.patternmatcher.classfinder
 
 import com.google.common.reflect.ClassPath
+import com.google.common.reflect.ClassPath.ClassInfo
 import lva.patternmatcher.MatchingResultSet.Matching
 import lva.patternmatcher.PatternMatcher
 import org.fusesource.jansi.Ansi
@@ -64,7 +65,7 @@ private fun Matching.split(matchings: List<Matching>): List<Matching> {
     val splitted = ArrayList<Matching>(matchings.size * 2 + 1).apply { add(this@split) }
 
     for (matching in matchings) {
-        splitted.last().takeIf { matching.containsWithin(it) }?.let {
+        splitted.last().takeIf { matching in it }?.let {
             splitted -= it
             splitted += it.splitByMatching(matching)
         }
@@ -73,8 +74,8 @@ private fun Matching.split(matchings: List<Matching>): List<Matching> {
     return splitted
 }
 
-private fun Matching.containsWithin(matching: Matching) =
-    to <= matching.to
+private operator fun Matching.contains(matching: Matching) =
+    to >= matching.to
 
 private fun Matching.splitByMatching(matching: Matching) = listOf(
     Matching(from, matching.from), Matching(matching.from, matching.to), Matching(matching.to, to)
@@ -85,7 +86,7 @@ private fun print(msg: String, fgColor: Ansi.Color = DEFAULT, attribute: Ansi.At
     AnsiConsole.out.flush()
 }
 
-private class ClassName(private val classInfo: ClassPath.ClassInfo) :
+private class ClassName(private val classInfo: ClassInfo) :
     CharSequence by classInfo.simpleName,
     Comparable<ClassName> {
 
