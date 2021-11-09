@@ -77,7 +77,7 @@ private fun Matching.split(matchings: List<Matching>): List<Matching> {
 private fun Matching.containsWithin(matching: Matching) =
     to <= matching.to
 
-private fun Matching.splitByMatching(matching: Matching) = arrayOf(
+private fun Matching.splitByMatching(matching: Matching) = listOf(
     Matching(from, matching.from), Matching(matching.from, matching.to), Matching(matching.to, to)
 )
 
