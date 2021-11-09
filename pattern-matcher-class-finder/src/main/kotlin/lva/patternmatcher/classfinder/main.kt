@@ -22,8 +22,8 @@ private val FG_COLORS = arrayOf(WHITE, RED)
 @ExperimentalTime
 fun main() = withAnsiConsole {
 
-    val classPath = ClassPath.from(ClassLoader.getSystemClassLoader())
-    val classNames = classPath.topLevelClasses.map { ClassName(it) }.toList()
+    val classNames = ClassPath.from(ClassLoader.getSystemClassLoader())
+        .topLevelClasses.map { ClassName(it) }
 
     print("loading ... ")
     val matcher = PatternMatcher(classNames)
