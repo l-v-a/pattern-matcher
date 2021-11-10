@@ -20,7 +20,7 @@ import kotlin.time.measureTimedValue
 private val FG_COLORS = arrayOf(WHITE, RED)
 
 @ExperimentalTime
-fun main() = withAnsiConsole {
+fun main() = ansiConsole {
 
     print("loading ... ")
     val classNames = ClassPath.from(ClassLoader.getSystemClassLoader())
@@ -53,7 +53,7 @@ fun main() = withAnsiConsole {
     }
 }
 
-private inline fun withAnsiConsole(block: () -> Unit) {
+private inline fun ansiConsole(block: () -> Unit) {
     AnsiConsole.systemInstall()
     try {
         block()
